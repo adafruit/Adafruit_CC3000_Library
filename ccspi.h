@@ -54,7 +54,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <Spi.h>
+#include <SPI.h>
 
 #include "utility/wlan.h"
 
