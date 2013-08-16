@@ -266,6 +266,7 @@ unsigned long getTime(void) {
               (unsigned long)buf[43]) - 2208988800UL;
         Serial.print(F("OK\r\n"));
       }
+      client.close();
     }
   }
   if(!t) Serial.println(F("error"));
