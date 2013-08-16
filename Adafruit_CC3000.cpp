@@ -1166,6 +1166,7 @@ int16_t Adafruit_CC3000_Client::write(const void *buf, uint16_t len, uint32_t fl
   return send(_socket, buf, len, flags);
 }
 
+
 size_t Adafruit_CC3000_Client::write(uint8_t c)
 {
   int32_t r;
@@ -1173,6 +1174,52 @@ size_t Adafruit_CC3000_Client::write(uint8_t c)
   if ( r < 0 ) return 0;
   return r;
 }
+
+size_t Adafruit_CC3000_Client::fastrprint(const __FlashStringHelper *ifsh)
+{
+  //Serial.println("*println*");
+  uint8_t idx = 0;
+
+  const char PROGMEM *p = (const char PROGMEM *)ifsh;
+  size_t n = 0;
+  while (1) {
+    unsigned char c = pgm_read_byte(p++);
+    if (c == 0) break;
+    _tx_buf[idx] = c;
+    idx++;
+    if (idx >= TXBUFFERSIZE) {
+      // lets send it!
+      n += send(_socket, _tx_buf, TXBUFFERSIZE, 0);
+      idx = 0;
+    }
+  }
+  // reached the end before filling the buffer completely
+  n += send(_socket, _tx_buf, idx, 0);
+
+  return n;
+}
+
+size_t Adafruit_CC3000_Client::fastrprintln(const __FlashStringHelper *ifsh)
+{
+  size_t r = 0;
+  r = fastrprint(ifsh);
+  r+= fastrprint("\n\r");
+  return r;
+}
+
+size_t Adafruit_CC3000_Client::fastrprintln(const char *str)
+{
+  size_t r = 0;
+  if ((r = write(str, strlen(str), 0)) <= 0) return 0;
+  if ((r += write("\n\r", 2, 0)) <= 0) return 0;  // meme fix
+  return r;
+}
+
+size_t Adafruit_CC3000_Client::fastrprint(const char *str)
+{
+  return write(str, strlen(str), 0);
+}
+
 
 int16_t Adafruit_CC3000_Client::read(void *buf, uint16_t len, uint32_t flags) 
 {

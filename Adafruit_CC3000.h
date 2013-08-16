@@ -29,6 +29,7 @@
 
 #define WLAN_CONNECT_TIMEOUT 10000  // how long to wait, in milliseconds
 #define RXBUFFERSIZE  64 // how much to buffer on the incoming side
+#define TXBUFFERSIZE  32 // how much to buffer on the outgoing side
 
 #define WIFI_ENABLE 1
 #define WIFI_DISABLE 0
@@ -63,6 +64,12 @@ class Adafruit_CC3000_Client : public Print {
   
   bool connected(void);
   size_t write(uint8_t c);
+
+  size_t fastrprint(const char *str);
+  size_t fastrprintln(const char *str);
+  size_t fastrprint(const __FlashStringHelper *ifsh);
+  size_t fastrprintln(const __FlashStringHelper *ifsh);
+
   int16_t write(const void *buf, uint16_t len, uint32_t flags = 0);
   int16_t read(void *buf, uint16_t len, uint32_t flags = 0);
   uint8_t read(void);
@@ -70,6 +77,7 @@ class Adafruit_CC3000_Client : public Print {
   uint8_t available(void);
 
   uint8_t _rx_buf[RXBUFFERSIZE], _rx_buf_idx;
+  char    _tx_buf[TXBUFFERSIZE];
   int16_t bufsiz;
 
  private:
