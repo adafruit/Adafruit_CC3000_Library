@@ -1082,12 +1082,7 @@ Adafruit_CC3000_Client Adafruit_CC3000::connectTCP(uint32_t destIP, uint16_t des
 }
 
 
-/**************************************************************************/
-/*!
-    @brief  Quick socket test to pull contents from the web
-*/
-/**************************************************************************/
-void Adafruit_CC3000::socketTestUDP(uint32_t destIP, uint16_t destPort, uint8_t *data, uint8_t siz)
+Adafruit_CC3000_Client Adafruit_CC3000::connectUDP(uint32_t destIP, uint16_t destPort)
 {
   sockaddr      socketAddress;
   uint32_t      udp_socket;
@@ -1095,23 +1090,17 @@ void Adafruit_CC3000::socketTestUDP(uint32_t destIP, uint16_t destPort, uint8_t 
   // Create the socket(s)
   // socket   = SOCK_STREAM, SOCK_DGRAM, or SOCK_RAW 
   // protocol = IPPROTO_TCP, IPPROTO_UDP or IPPROTO_RAW
-  Serial.print(F("Creating socket... "));
+  //Serial.print(F("Creating socket... "));
   udp_socket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
   if (-1 == udp_socket)
   {
     Serial.println(F("Failed to open socket"));
-    return;
+    return Adafruit_CC3000_Client();
   }
-  Serial.print(F("DONE (socket ")); Serial.print(udp_socket); Serial.println(F(")"));
-
-  Serial.print(F("Connect to "));
-  printIPdotsRev(destIP);
-  Serial.print(':');
-  Serial.println(destPort);
+  //Serial.print(F("DONE (socket ")); Serial.print(udp_socket); Serial.println(F(")"));
 
   // Try to open the socket
   memset(&socketAddress, 0x00, sizeof(socketAddress));
-
   socketAddress.sa_family = AF_INET;
   socketAddress.sa_data[0] = (destPort & 0xFF00) >> 8;  // Set the Port Number
   socketAddress.sa_data[1] = (destPort & 0x00FF);
@@ -1119,22 +1108,23 @@ void Adafruit_CC3000::socketTestUDP(uint32_t destIP, uint16_t destPort, uint8_t 
   socketAddress.sa_data[3] = destIP >> 16;
   socketAddress.sa_data[4] = destIP >> 8;
   socketAddress.sa_data[5] = destIP;
-  printHex((byte *)&socketAddress, sizeof(socketAddress));
-  
-  // UDP sendto
-  Serial.print(F("Sending UDP packet ... "));
-  int32_t ret = sendto(udp_socket, data, siz, 0, 
-		       &socketAddress, sizeof(socketAddress));
-  if (ret == -1)
+
+  Serial.print(F("Connect to "));
+  printIPdotsRev(destIP);
+  Serial.print(':');
+  Serial.println(destPort);
+
+  //printHex((byte *)&socketAddress, sizeof(socketAddress));
+  if (-1 == connect(udp_socket, &socketAddress, sizeof(socketAddress)))
   {
-    Serial.println(F("Failed sending UDP"));
-    return;
+    Serial.println(F("Connection error"));
+    closesocket(udp_socket);
+    return Adafruit_CC3000_Client();
   }
-  Serial.print(F("Sent "));
-  Serial.print(ret);
-  Serial.println(F(" bytes"));
-  /* Clean up */
+
+  return Adafruit_CC3000_Client(udp_socket);
 }
+
 
 /**********************************************************************/
 Adafruit_CC3000_Client::Adafruit_CC3000_Client(void) {
