@@ -70,7 +70,27 @@ extern uint8_t g_csPin, g_irqPin, g_vbatPin, g_IRQnum, g_SPIspeed;
 #define CC3000_ASSERT_CS                digitalWrite(g_csPin, LOW);
 #define CC3000_DEASSERT_CS              digitalWrite(g_csPin, HIGH);
 
-uint8_t mySPCR;
+/*
+these variables store the SPI configuration
+so they can be modified and restored
+this is so that we can have multiple SPI devices
+on the same bus, so they can operate at different speeds
+and in different modes
+*/
+#if defined(SPI2X) // most likely AVR8
+uint8_t ccspi_mySPCR, ccspi_mySPSR, ccspi_oldSPSR, ccspi_oldSPCR;
+#define SpiConfigStore()		do { ccspi_mySPCR = SPCR; ccspi_mySPSR = SPSR & _BV(SPI2X); } while (0)
+#define SpiConfigPush()			do { ccspi_oldSPCR = SPCR; ccspi_oldSPSR = SPSR & _BV(SPI2X); SPCR = ccspi_mySPCR; SPSR |= ccspi_mySPSR & _BV(SPI2X); } while (0)
+#define SpiConfigPop()			do { SPCR = ccspi_oldSPCR; SPSR |= ccspi_oldSPSR & _BV(SPI2X); } while (0)
+#elif defined(__AVR_XMEGA__) // most likely XMEGA
+uint8_t ccspi_mySPICTRL, ccspi_oldSPICTRL;
+#define SpiConfigStore()		do { ccspi_mySPICTRL = SPCR; } while (0)
+#define SpiConfigPush()			do { ccspi_oldSPICTRL = SPCR; SPCR = ccspi_mySPICTRL; } while (0)
+#define SpiConfigPop()			do { SPCR = ccspi_oldSPICTRL; } while (0)
+#else
+// TODO: ARM (Due, Teensy 3.0, etc)
+#error platform not yet supported by Adafruit_CC3000
+#endif
 
 /* smartconfig flags (defined in Adafruit_CC3000.cpp) */
 // extern unsigned long ulSmartConfigFinished, ulCC3000DHCP;
@@ -186,7 +206,6 @@ int init_spi(void)
   pinMode(g_csPin, OUTPUT);
   CC3000_DEASSERT_CS;
 
-  
   /* Set interrupt/gpio pin to input */
   pinMode(g_irqPin, INPUT);
   digitalWrite(g_irqPin, HIGH); // w/weak pullup
@@ -197,8 +216,7 @@ int init_spi(void)
   SPI.setBitOrder(MSBFIRST);
   SPI.setClockDivider(g_SPIspeed);
   
-  // keep for later ref
-  mySPCR = SPCR;
+  SpiConfigStore();
 
   /* ToDo: Configure IRQ interrupt! */
 
@@ -245,7 +263,6 @@ long SpiFirstWrite(unsigned char *ucBuf, unsigned short usLength)
 long SpiWrite(unsigned char *pUserBuffer, unsigned short usLength)
 {
   unsigned char ucPad = 0;
-  uint8_t spcrback;
 
   DEBUGPRINT_F("\tCC3000: SpiWrite\n\r");
   
@@ -297,9 +314,7 @@ long SpiWrite(unsigned char *pUserBuffer, unsigned short usLength)
     /* Assert the CS line and wait till SSI IRQ line is active and then initialize write operation */
     CC3000_ASSERT_CS;
 
-    // Set SPI mode
-    spcrback = SPCR;
-    SPCR = mySPCR;
+    SpiConfigPush();
 
     /* Re-enable IRQ - if it was not disabled - this is not a problem... */
     tSLInformation.WlanInterruptEnable();
@@ -311,7 +326,7 @@ long SpiWrite(unsigned char *pUserBuffer, unsigned short usLength)
 
       sSpiInformation.ulSpiState = eSPI_STATE_IDLE;
 
-      SPCR = spcrback;
+      SpiConfigPop();
       CC3000_DEASSERT_CS;
     }
   }
@@ -641,8 +656,6 @@ char *sendWLFWPatch(unsigned long *Length) {
 
 void SPI_IRQ(void)
 {
-  uint8_t spcrback;
-
   DEBUGPRINT_F("\tCC3000: Entering SPI_IRQ\n\r");
     
   if (sSpiInformation.ulSpiState == eSPI_STATE_POWERUP)
@@ -656,8 +669,7 @@ void SPI_IRQ(void)
     sSpiInformation.ulSpiState = eSPI_STATE_READ_IRQ;    
     /* IRQ line goes down - start reception */
 
-    spcrback = SPCR;
-    SPCR = mySPCR;
+    SpiConfigPush();
 
     CC3000_ASSERT_CS;
 
@@ -672,7 +684,7 @@ void SPI_IRQ(void)
     SpiWriteDataSynchronous(sSpiInformation.pTxPacket, sSpiInformation.usTxPacketLength);
     sSpiInformation.ulSpiState = eSPI_STATE_IDLE;
     CC3000_DEASSERT_CS;
-    SPCR = spcrback;
+    SpiConfigPop();
   }
 
   DEBUGPRINT_F("\tCC3000: Leaving SPI_IRQ\n\r");
