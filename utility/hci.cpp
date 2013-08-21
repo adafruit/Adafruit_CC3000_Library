@@ -206,6 +206,8 @@ hci_patch_send(unsigned char ucOpcode, unsigned char *pucBuff, char *patch, unsi
 		
 		while (usDataLength)
 		{
+			cc3k_int_poll();
+
 			if (usDataLength <= SL_PATCH_PORTION_SIZE)
 			{
 				usTransLength = usDataLength;

@@ -332,6 +332,20 @@ extern uint32_t STREAM_TO_UINT32_f(char* p, uint16_t offset);
 
 
 //*****************************************************************************
+//
+//!  cc3k_int_poll
+//!
+//!  \brief               checks if the interrupt pin is low
+//!                       just in case the hardware missed a falling edge
+//!                       function is in ccspi.cpp
+//
+//*****************************************************************************
+
+extern void cc3k_int_poll();
+
+
+
+//*****************************************************************************
 //                    COMMON MACROs
 //*****************************************************************************
 

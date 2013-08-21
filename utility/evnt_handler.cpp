@@ -246,6 +246,8 @@ hci_event_handler(void *pRetParams, unsigned char *from, unsigned char *fromlen)
 
 	while (1)
 	{
+		cc3k_int_poll();
+
 		if (tSLInformation.usEventOrDataReceived != 0)
 		{
 

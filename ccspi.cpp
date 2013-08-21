@@ -117,6 +117,7 @@ void SpiWriteAsync(const unsigned char *data, unsigned short size);
 void SpiPauseSpi(void);
 void SpiResumeSpi(void);
 void SSIContReadOperation(void);
+void cc3k_int_poll(void);
 
 // The magic number that resides at the end of the TX/RX buffer (1 byte after the allocated size)
 // for the purpose of detection of the overrun. The location of the memory where the magic number
@@ -126,6 +127,9 @@ void SSIContReadOperation(void);
 
 char spi_buffer[CC3000_RX_BUFFER_SIZE];
 unsigned char wlan_tx_buffer[CC3000_TX_BUFFER_SIZE];
+
+static volatile char ccspi_is_in_irq = 0;
+static volatile char ccspi_int_enabled = 0;
 
 /* Mandatory functions are:
     - SpiOpen
@@ -345,12 +349,16 @@ long SpiWrite(unsigned char *pUserBuffer, unsigned short usLength)
 /**************************************************************************/
 void SpiWriteDataSynchronous(unsigned char *data, unsigned short size)
 {
+  unsigned char dummy;
+  
   DEBUGPRINT_F("\tCC3000: SpiWriteDataSynchronous Start\n\r");
 
   uint8_t loc;
   for (loc = 0; loc < size; loc ++) 
   {
-    SPI.transfer(data[loc]);
+    SPDR = data[loc];               /* Start the transmission           */
+    while (!(SPSR & (1<<SPIF)));    /* Wait the end of the transmission */
+    dummy = SPDR;
 #if (DEBUG_MODE == 1)
       if (!(loc==size-1))
       {
@@ -468,6 +476,7 @@ void SpiPauseSpi(void)
 {
   DEBUGPRINT_F("\tCC3000: SpiPauseSpi\n\r");
 
+  ccspi_int_enabled = 0;
   detachInterrupt(g_IRQnum);
 }
 
@@ -480,6 +489,7 @@ void SpiResumeSpi(void)
 {
   DEBUGPRINT_F("\tCC3000: SpiResumeSpi\n\r");
 
+  ccspi_int_enabled = 1;
   attachInterrupt(g_IRQnum, SPI_IRQ, FALLING);
 }
 
@@ -578,6 +588,7 @@ void WlanInterruptEnable()
 {
   DEBUGPRINT_F("\tCC3000: WlanInterruptEnable.\n\r");
   // delay(100);
+  ccspi_int_enabled = 1;
   attachInterrupt(g_IRQnum, SPI_IRQ, FALLING);
 }
 
@@ -589,6 +600,7 @@ void WlanInterruptEnable()
 void WlanInterruptDisable()
 {
   DEBUGPRINT_F("\tCC3000: WlanInterruptDisable\n\r");
+  ccspi_int_enabled = 0;
   detachInterrupt(g_IRQnum);
 }
 
@@ -652,6 +664,8 @@ char *sendWLFWPatch(unsigned long *Length) {
 
 void SPI_IRQ(void)
 {
+  ccspi_is_in_irq = 1;
+
   DEBUGPRINT_F("\tCC3000: Entering SPI_IRQ\n\r");
     
   if (sSpiInformation.ulSpiState == eSPI_STATE_POWERUP)
@@ -684,6 +698,24 @@ void SPI_IRQ(void)
   }
 
   DEBUGPRINT_F("\tCC3000: Leaving SPI_IRQ\n\r");
-  
+
+  ccspi_is_in_irq = 0;
   return;
+}
+
+//*****************************************************************************
+//
+//!  cc3k_int_poll
+//!
+//!  \brief               checks if the interrupt pin is low
+//!                       just in case the hardware missed a falling edge
+//!                       function is in ccspi.cpp
+//
+//*****************************************************************************
+
+void cc3k_int_poll()
+{
+  if (digitalRead(g_irqPin) == LOW && ccspi_is_in_irq == 0 && ccspi_int_enabled != 0) {
+    SPI_IRQ();
+  }
 }
