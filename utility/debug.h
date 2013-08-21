@@ -47,7 +47,7 @@ void printDec16(uint16_t h);
 
 #define PRINT_F(__s)         DEBUGPRINT(FLASHIFY(__s))
 
-#if (DEBUG_MODE == 1)
+#if (DEBUG_MODE != 0)
 #define DEBUGPRINT_F(__s)         DEBUGPRINT(FLASHIFY(__s))
 #define DEBUGPRINT_DEC(x)  printDec(x)
 #define DEBUGPRINT_DEC16(x)  printDec16(x)

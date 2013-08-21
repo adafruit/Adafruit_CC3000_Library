@@ -345,16 +345,12 @@ long SpiWrite(unsigned char *pUserBuffer, unsigned short usLength)
 /**************************************************************************/
 void SpiWriteDataSynchronous(unsigned char *data, unsigned short size)
 {
-  unsigned char dummy;
-  
   DEBUGPRINT_F("\tCC3000: SpiWriteDataSynchronous Start\n\r");
 
   uint8_t loc;
   for (loc = 0; loc < size; loc ++) 
   {
-    SPDR = data[loc];               /* Start the transmission           */
-    while (!(SPSR & (1<<SPIF)));    /* Wait the end of the transmission */
-    dummy = SPDR;
+    SPI.transfer(data[loc]);
 #if (DEBUG_MODE == 1)
       if (!(loc==size-1))
       {

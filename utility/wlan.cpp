@@ -3,9 +3,9 @@
 *  wlan.c  - CC3000 Host Driver Implementation.
 *  Copyright (C) 2011 Texas Instruments Incorporated - http://www.ti.com/
 *
-* Adapted for use with the Arduino/AVR by KTOWN (Kevin Townsend) 
+* Adapted for use with the Arduino/AVR by KTOWN (Kevin Townsend)
 * & Limor Fried for Adafruit Industries
-* This library works with the Adafruit CC3000 breakout 
+* This library works with the Adafruit CC3000 breakout
 *	----> https://www.adafruit.com/products/1469
 * Adafruit invests time and resources providing this open source code,
 * please support Adafruit and open-source hardware by purchasing
@@ -20,23 +20,23 @@
 *
 *    Redistributions in binary form must reproduce the above copyright
 *    notice, this list of conditions and the following disclaimer in the
-*    documentation and/or other materials provided with the   
+*    documentation and/or other materials provided with the
 *    distribution.
 *
 *    Neither the name of Texas Instruments Incorporated nor the names of
 *    its contributors may be used to endorse or promote products derived
 *    from this software without specific prior written permission.
 *
-*  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
-*  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
+*  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+*  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
 *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-*  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT 
-*  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
-*  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT 
+*  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+*  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+*  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
 *  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
 *  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-*  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT 
-*  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
+*  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+*  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 *  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *
 *****************************************************************************/
@@ -62,7 +62,7 @@ volatile sSimplLinkInformation tSLInformation;
 #define SMART_CONFIG_PROFILE_SIZE		67		// 67 = 32 (max ssid) + 32 (max key) + 1 (SSID length) + 1 (security type) + 1 (key length)
 
 #ifndef CC3000_UNENCRYPTED_SMART_CONFIG
-unsigned char key[AES128_KEY_SIZE];	
+unsigned char key[AES128_KEY_SIZE];
 unsigned char profileArray[SMART_CONFIG_PROFILE_SIZE];
 #endif //CC3000_UNENCRYPTED_SMART_CONFIG
 
@@ -94,7 +94,7 @@ unsigned char profileArray[SMART_CONFIG_PROFILE_SIZE];
 #define WLAN_SET_MASK_PARAMS_LEN				(4)
 #define WLAN_SET_SCAN_PARAMS_LEN				(100)
 #define WLAN_GET_SCAN_RESULTS_PARAMS_LEN		(4)
-#define WLAN_ADD_PROFILE_NOSEC_PARAM_LEN		(24)			
+#define WLAN_ADD_PROFILE_NOSEC_PARAM_LEN		(24)
 #define WLAN_ADD_PROFILE_WEP_PARAM_LEN			(36)
 #define WLAN_ADD_PROFILE_WPA_PARAM_LEN			(44)
 #define WLAN_CONNECT_PARAM_LEN					(29)
@@ -108,9 +108,9 @@ unsigned char profileArray[SMART_CONFIG_PROFILE_SIZE];
 //!  SimpleLink_Init_Start
 //!
 //!  @param  usPatchesAvailableAtHost  flag to indicate if patches available
-//!                                    from host or from EEPROM. Due to the 
+//!                                    from host or from EEPROM. Due to the
 //!                                    fact the patches are burn to the EEPROM
-//!                                    using the patch programmer utility, the 
+//!                                    using the patch programmer utility, the
 //!                                    patches will be available from the EEPROM
 //!                                    and not from the host.
 //!
@@ -123,14 +123,14 @@ static void SimpleLink_Init_Start(unsigned short usPatchesAvailableAtHost)
 {
 	unsigned char *ptr;
 	unsigned char *args;
-	
+
 	ptr = tSLInformation.pucTxCommandBuffer;
 	args = (unsigned char *)(ptr + HEADERS_SIZE_CMD);
-	if (usPatchesAvailableAtHost > 2) 
+	if (usPatchesAvailableAtHost > 2)
 	  usPatchesAvailableAtHost = 2;
 
 	UINT8_TO_STREAM(args, usPatchesAvailableAtHost);
-	
+
 	// IRQ Line asserted - send HCI_CMND_SIMPLE_LINK_START to CC3000
 	hci_command_send(HCI_CMND_SIMPLE_LINK_START, ptr, WLAN_SL_INIT_START_PARAMS_LEN);
 	SimpleLinkWaitEvent(HCI_CMND_SIMPLE_LINK_START, 0);
@@ -142,41 +142,41 @@ static void SimpleLink_Init_Start(unsigned short usPatchesAvailableAtHost)
 //
 //!  wlan_init
 //!
-//!  @param  sWlanCB   Asynchronous events callback.  
+//!  @param  sWlanCB   Asynchronous events callback.
 //!                    0 no event call back.
 //!                  -call back parameters:
 //!                   1) event_type: HCI_EVNT_WLAN_UNSOL_CONNECT connect event,
 //!                     HCI_EVNT_WLAN_UNSOL_DISCONNECT disconnect event,
 //!                     HCI_EVNT_WLAN_ASYNC_SIMPLE_CONFIG_DONE config done,
-//!                     HCI_EVNT_WLAN_UNSOL_DHCP dhcp report, 
-//!                     HCI_EVNT_WLAN_ASYNC_PING_REPORT ping report OR 
+//!                     HCI_EVNT_WLAN_UNSOL_DHCP dhcp report,
+//!                     HCI_EVNT_WLAN_ASYNC_PING_REPORT ping report OR
 //!                     HCI_EVNT_WLAN_KEEPALIVE keepalive.
 //!                   2) data: pointer to extra data that received by the event
 //!                     (NULL no data).
 //!                   3) length: data length.
 //!                  -Events with extra data:
-//!                     HCI_EVNT_WLAN_UNSOL_DHCP: 4 bytes IP, 4 bytes Mask, 
+//!                     HCI_EVNT_WLAN_UNSOL_DHCP: 4 bytes IP, 4 bytes Mask,
 //!                     4 bytes default gateway, 4 bytes DHCP server and 4 bytes
 //!                     for DNS server.
-//!                     HCI_EVNT_WLAN_ASYNC_PING_REPORT: 4 bytes Packets sent, 
-//!                     4 bytes Packets received, 4 bytes Min round time, 
+//!                     HCI_EVNT_WLAN_ASYNC_PING_REPORT: 4 bytes Packets sent,
+//!                     4 bytes Packets received, 4 bytes Min round time,
 //!                     4 bytes Max round time and 4 bytes for Avg round time.
 //!
-//!  @param    sFWPatches  0 no patch or pointer to FW patches 
+//!  @param    sFWPatches  0 no patch or pointer to FW patches
 //!  @param    sDriverPatches  0 no patch or pointer to driver patches
 //!  @param    sBootLoaderPatches  0 no patch or pointer to bootloader patches
-//!  @param    sReadWlanInterruptPin    init callback. the callback read wlan 
+//!  @param    sReadWlanInterruptPin    init callback. the callback read wlan
 //!            interrupt status.
-//!  @param    sWlanInterruptEnable   init callback. the callback enable wlan 
+//!  @param    sWlanInterruptEnable   init callback. the callback enable wlan
 //!            interrupt.
 //!  @param    sWlanInterruptDisable   init callback. the callback disable wlan
 //!            interrupt.
-//!  @param    sWriteWlanPin      init callback. the callback write value 
-//!            to device pin.  
+//!  @param    sWriteWlanPin      init callback. the callback write value
+//!            to device pin.
 //!
 //!  @return   none
 //!
-//!  @sa       wlan_set_event_mask , wlan_start , wlan_stop 
+//!  @sa       wlan_set_event_mask , wlan_start , wlan_stop
 //!
 //!  @brief    Initialize wlan driver
 //!
@@ -184,29 +184,29 @@ static void SimpleLink_Init_Start(unsigned short usPatchesAvailableAtHost)
 //
 //*****************************************************************************
 
-void wlan_init(tWlanCB	 	sWlanCB,
-	       tFWPatches sFWPatches,
-	       tDriverPatches sDriverPatches,
-	       tBootLoaderPatches sBootLoaderPatches,
-							 tWlanReadInteruptPin  sReadWlanInterruptPin,
-							 tWlanInterruptEnable  sWlanInterruptEnable,
-							 tWlanInterruptDisable sWlanInterruptDisable,
-							 tWriteWlanPin         sWriteWlanPin)
+void wlan_init(	tWlanCB 				sWlanCB,
+				tFWPatches 				sFWPatches,
+				tDriverPatches 			sDriverPatches,
+				tBootLoaderPatches 		sBootLoaderPatches,
+				tWlanReadInteruptPin 	sReadWlanInterruptPin,
+				tWlanInterruptEnable 	sWlanInterruptEnable,
+				tWlanInterruptDisable 	sWlanInterruptDisable,
+				tWriteWlanPin			sWriteWlanPin)
 {
-	
+
 	tSLInformation.sFWPatches = sFWPatches;
 	tSLInformation.sDriverPatches = sDriverPatches;
 	tSLInformation.sBootLoaderPatches = sBootLoaderPatches;
-	
+
 	// init io callback
 	tSLInformation.ReadWlanInterruptPin = sReadWlanInterruptPin;
 	tSLInformation.WlanInterruptEnable  = sWlanInterruptEnable;
 	tSLInformation.WlanInterruptDisable = sWlanInterruptDisable;
 	tSLInformation.WriteWlanPin = sWriteWlanPin;
-	
+
 	//init asynchronous events callback
 	tSLInformation.sWlanCB= sWlanCB;
-	
+
 	// By default TX Complete events are routed to host too
 	tSLInformation.InformHostOnTxComplete = 1;
 }
@@ -217,19 +217,19 @@ void wlan_init(tWlanCB	 	sWlanCB,
 //!
 //!  @param         pvBuffer - pointer to the received data buffer
 //!                      The function triggers Received event/data processing
-//!                 
+//!
 //!  @param         Pointer to the received data
 //!  @return        none
 //!
-//!  @brief         The function triggers Received event/data processing. It is 
+//!  @brief         The function triggers Received event/data processing. It is
 //! 			          called from the SPI library to receive the data
 //
 //*****************************************************************************
 void SpiReceiveHandler(void *pvBuffer)
-{	
+{
 	tSLInformation.usEventOrDataReceived = 1;
 	tSLInformation.pucReceivedData = (unsigned char 	*)pvBuffer;
-	
+
 	hci_unsolicited_event_handler();
 }
 
@@ -239,22 +239,22 @@ void SpiReceiveHandler(void *pvBuffer)
 //!  wlan_start
 //!
 //!  @param   usPatchesAvailableAtHost -  flag to indicate if patches available
-//!                                    from host or from EEPROM. Due to the 
+//!                                    from host or from EEPROM. Due to the
 //!                                    fact the patches are burn to the EEPROM
-//!                                    using the patch programmer utility, the 
+//!                                    using the patch programmer utility, the
 //!                                    patches will be available from the EEPROM
 //!                                    and not from the host.
 //!
 //!  @return        none
 //!
-//!  @brief        Start WLAN device. This function asserts the enable pin of 
+//!  @brief        Start WLAN device. This function asserts the enable pin of
 //!                the device (WLAN_EN), starting the HW initialization process.
 //!                The function blocked until device Initialization is completed.
-//!                Function also configure patches (FW, driver or bootloader) 
+//!                Function also configure patches (FW, driver or bootloader)
 //!                and calls appropriate device callbacks.
 //!
 //!  @Note          Prior calling the function wlan_init shall be called.
-//!  @Warning       This function must be called after wlan_init and before any 
+//!  @Warning       This function must be called after wlan_init and before any
 //!                 other wlan API
 //!  @sa            wlan_init , wlan_stop
 //!
@@ -264,9 +264,9 @@ void SpiReceiveHandler(void *pvBuffer)
 void
 wlan_start(unsigned short usPatchesAvailableAtHost)
 {
-	
+
 	unsigned long ulSpiIRQState;
-	
+
 	tSLInformation.NumberOfSentPackets = 0;
 	tSLInformation.NumberOfReleasedPackets = 0;
 	tSLInformation.usRxEventOpcode = 0;
@@ -277,19 +277,19 @@ wlan_start(unsigned short usPatchesAvailableAtHost)
 	tSLInformation.slTransmitDataError = 0;
 	tSLInformation.usEventOrDataReceived = 0;
 	tSLInformation.pucReceivedData = 0;
-	
+
 	// Allocate the memory for the RX/TX data transactions
 	tSLInformation.pucTxCommandBuffer = (unsigned char *)wlan_tx_buffer;
-	
+
 	// init spi
 	SpiOpen(SpiReceiveHandler);
-	
+
 	// Check the IRQ line
 	ulSpiIRQState = tSLInformation.ReadWlanInterruptPin();
-	
+
 	// ASIC 1273 chip enable: toggle WLAN EN line
 	tSLInformation.WriteWlanPin( WLAN_ENABLE );
-	
+
 	if (ulSpiIRQState)
 	{
 		// wait till the IRQ line goes low
@@ -303,14 +303,14 @@ wlan_start(unsigned short usPatchesAvailableAtHost)
 		while(tSLInformation.ReadWlanInterruptPin() == 0)
 		{
 		}
-		
+
 		while(tSLInformation.ReadWlanInterruptPin() != 0)
 		{
 		}
 	}
 	DEBUGPRINT_F("SimpleLink start\n\r");
 	SimpleLink_Init_Start(usPatchesAvailableAtHost);
-	
+
 	// Read Buffer's size and finish
 	DEBUGPRINT_F("Read buffer\n\r");
 	hci_command_send(HCI_CMND_READ_BUFFER_SIZE, tSLInformation.pucTxCommandBuffer, 0);
@@ -337,18 +337,18 @@ wlan_stop(void)
 {
 	// ASIC 1273 chip disable
 	tSLInformation.WriteWlanPin( WLAN_DISABLE );
-	
+
 	// Wait till IRQ line goes high...
 	while(tSLInformation.ReadWlanInterruptPin() == 0)
 	{
 	}
-	
+
 	// Free the used by WLAN Driver memory
 	if (tSLInformation.pucTxCommandBuffer)
 	{
 		tSLInformation.pucTxCommandBuffer = 0;
 	}
-	
+
 	SpiClose();
 }
 
@@ -358,23 +358,23 @@ wlan_stop(void)
 //!  wlan_connect
 //!
 //!  @param    sec_type   security options:
-//!               WLAN_SEC_UNSEC, 
+//!               WLAN_SEC_UNSEC,
 //!               WLAN_SEC_WEP (ASCII support only),
 //!               WLAN_SEC_WPA or WLAN_SEC_WPA2
 //!  @param    ssid       up to 32 bytes and is ASCII SSID of the AP
 //!  @param    ssid_len   length of the SSID
 //!  @param    bssid      6 bytes specified the AP bssid
 //!  @param    key        up to 16 bytes specified the AP security key
-//!  @param    key_len    key length 
+//!  @param    key_len    key length
 //!
-//!  @return     On success, zero is returned. On error, negative is returned. 
+//!  @return     On success, zero is returned. On error, negative is returned.
 //!              Note that even though a zero is returned on success to trigger
 //!              connection operation, it does not mean that CCC3000 is already
-//!              connected. An asynchronous "Connected" event is generated when 
+//!              connected. An asynchronous "Connected" event is generated when
 //!              actual association process finishes and CC3000 is connected to
-//!              the AP. If DHCP is set, An asynchronous "DHCP" event is 
+//!              the AP. If DHCP is set, An asynchronous "DHCP" event is
 //!              generated when DHCP process is finish.
-//!              
+//!
 //!
 //!  @brief      Connect to AP
 //!  @warning    Please Note that when connection to AP configured with security
@@ -383,7 +383,7 @@ wlan_stop(void)
 //!  @sa         wlan_disconnect
 //
 //*****************************************************************************
-  
+
 #ifndef CC3000_TINY_DRIVER
 long
 wlan_connect(unsigned long ulSecType, const char *ssid, long ssid_len,
@@ -393,11 +393,11 @@ wlan_connect(unsigned long ulSecType, const char *ssid, long ssid_len,
 	unsigned char *ptr;
 	unsigned char *args;
 	unsigned char bssid_zero[] = {0, 0, 0, 0, 0, 0};
-	
+
 	ret  	= EFAIL;
 	ptr  	= tSLInformation.pucTxCommandBuffer;
 	args 	= (ptr + HEADERS_SIZE_CMD);
-	
+
 	// Fill in command buffer
 	args = UINT32_TO_STREAM(args, 0x0000001c);
 	args = UINT32_TO_STREAM(args, ssid_len);
@@ -405,7 +405,7 @@ wlan_connect(unsigned long ulSecType, const char *ssid, long ssid_len,
 	args = UINT32_TO_STREAM(args, 0x00000010 + ssid_len);
 	args = UINT32_TO_STREAM(args, key_len);
 	args = UINT16_TO_STREAM(args, 0);
-	
+
 	// padding shall be zeroed
 	if(bssid)
 	{
@@ -415,22 +415,22 @@ wlan_connect(unsigned long ulSecType, const char *ssid, long ssid_len,
 	{
 		ARRAY_TO_STREAM(args, bssid_zero, ETH_ALEN);
 	}
-	
+
 	ARRAY_TO_STREAM(args, ssid, ssid_len);
-	
+
 	if(key_len && key)
 	{
 		ARRAY_TO_STREAM(args, key, key_len);
 	}
-	
+
 	// Initiate a HCI command
-	hci_command_send(HCI_CMND_WLAN_CONNECT, ptr, WLAN_CONNECT_PARAM_LEN + 
+	hci_command_send(HCI_CMND_WLAN_CONNECT, ptr, WLAN_CONNECT_PARAM_LEN +
 									 ssid_len + key_len - 1);
-	
+
 	// Wait for command complete event
 	SimpleLinkWaitEvent(HCI_CMND_WLAN_CONNECT, &ret);
 	errno = ret;
-	
+
 	return(ret);
 }
 #else
@@ -441,11 +441,11 @@ wlan_connect(const char *ssid, long ssid_len)
 	unsigned char *ptr;
 	unsigned char *args;
 	unsigned char bssid_zero[] = {0, 0, 0, 0, 0, 0};
-	
+
 	ret  	= EFAIL;
 	ptr  	= tSLInformation.pucTxCommandBuffer;
 	args 	= (ptr + HEADERS_SIZE_CMD);
-	
+
 	// Fill in command buffer
 	args = UINT32_TO_STREAM(args, 0x0000001c);
 	args = UINT32_TO_STREAM(args, ssid_len);
@@ -453,19 +453,19 @@ wlan_connect(const char *ssid, long ssid_len)
 	args = UINT32_TO_STREAM(args, 0x00000010 + ssid_len);
 	args = UINT32_TO_STREAM(args, 0);
 	args = UINT16_TO_STREAM(args, 0);
-	
+
 	// padding shall be zeroed
 	ARRAY_TO_STREAM(args, bssid_zero, ETH_ALEN);
 	ARRAY_TO_STREAM(args, ssid, ssid_len);
-	
+
 	// Initiate a HCI command
-	hci_command_send(HCI_CMND_WLAN_CONNECT, ptr, WLAN_CONNECT_PARAM_LEN + 
+	hci_command_send(HCI_CMND_WLAN_CONNECT, ptr, WLAN_CONNECT_PARAM_LEN +
 									 ssid_len  - 1);
-	
+
 	// Wait for command complete event
 	SimpleLinkWaitEvent(HCI_CMND_WLAN_CONNECT, &ret);
 	errno = ret;
-	
+
 	return(ret);
 }
 #endif
@@ -474,9 +474,9 @@ wlan_connect(const char *ssid, long ssid_len)
 //
 //!  wlan_disconnect
 //!
-//!  @return    0 disconnected done, other CC3000 already disconnected            
+//!  @return    0 disconnected done, other CC3000 already disconnected
 //!
-//!  @brief      Disconnect connection from AP. 
+//!  @brief      Disconnect connection from AP.
 //!
 //!  @sa         wlan_connect
 //
@@ -487,16 +487,16 @@ wlan_disconnect()
 {
 	long ret;
 	unsigned char *ptr;
-	
+
 	ret = EFAIL;
 	ptr = tSLInformation.pucTxCommandBuffer;
-	
+
 	hci_command_send(HCI_CMND_WLAN_DISCONNECT, ptr, 0);
-	
+
 	// Wait for command complete event
 	SimpleLinkWaitEvent(HCI_CMND_WLAN_DISCONNECT, &ret);
 	errno = ret;
-	
+
 	return(ret);
 }
 
@@ -504,59 +504,59 @@ wlan_disconnect()
 //
 //!  wlan_ioctl_set_connection_policy
 //!
-//!  @param    should_connect_to_open_ap  enable(1), disable(0) connect to any 
-//!            available AP. This parameter corresponds to the configuration of 
+//!  @param    should_connect_to_open_ap  enable(1), disable(0) connect to any
+//!            available AP. This parameter corresponds to the configuration of
 //!            item # 3 in the brief description.
-//!  @param    should_use_fast_connect enable(1), disable(0). if enabled, tries 
-//!            to connect to the last connected AP. This parameter corresponds 
+//!  @param    should_use_fast_connect enable(1), disable(0). if enabled, tries
+//!            to connect to the last connected AP. This parameter corresponds
 //!            to the configuration of item # 1 in the brief description.
-//!  @param    auto_start enable(1), disable(0) auto connect 
-//!            after reset and periodically reconnect if needed. This 
+//!  @param    auto_start enable(1), disable(0) auto connect
+//!            after reset and periodically reconnect if needed. This
 //!       	   configuration configures option 2 in the above description.
 //!
-//!  @return     On success, zero is returned. On error, -1 is returned        
+//!  @return     On success, zero is returned. On error, -1 is returned
 //!
-//!  @brief      When auto is enabled, the device tries to connect according 
+//!  @brief      When auto is enabled, the device tries to connect according
 //!              the following policy:
-//!              1) If fast connect is enabled and last connection is valid, 
-//!                 the device will try to connect to it without the scanning 
+//!              1) If fast connect is enabled and last connection is valid,
+//!                 the device will try to connect to it without the scanning
 //!                 procedure (fast). The last connection will be marked as
-//!                 invalid, due to adding/removing profile. 
-//!              2) If profile exists, the device will try to connect it 
+//!                 invalid, due to adding/removing profile.
+//!              2) If profile exists, the device will try to connect it
 //!                 (Up to seven profiles).
 //!              3) If fast and profiles are not found, and open mode is
 //!                 enabled, the device will try to connect to any AP.
 //!              * Note that the policy settings are stored in the CC3000 NVMEM.
 //!
-//!  @sa         wlan_add_profile , wlan_ioctl_del_profile 
+//!  @sa         wlan_add_profile , wlan_ioctl_del_profile
 //
 //*****************************************************************************
 
 long
-wlan_ioctl_set_connection_policy(unsigned long should_connect_to_open_ap, 
+wlan_ioctl_set_connection_policy(unsigned long should_connect_to_open_ap,
                                  unsigned long ulShouldUseFastConnect,
                                  unsigned long ulUseProfiles)
 {
 	long ret;
 	unsigned char *ptr;
 	unsigned char *args;
-	
+
 	ret = EFAIL;
 	ptr = tSLInformation.pucTxCommandBuffer;
 	args = (unsigned char *)(ptr + HEADERS_SIZE_CMD);
-	
+
 	// Fill in HCI packet structure
 	args = UINT32_TO_STREAM(args, should_connect_to_open_ap);
 	args = UINT32_TO_STREAM(args, ulShouldUseFastConnect);
 	args = UINT32_TO_STREAM(args, ulUseProfiles);
-	
+
 	// Initiate a HCI command
 	hci_command_send(HCI_CMND_WLAN_IOCTL_SET_CONNECTION_POLICY,
 									 ptr, WLAN_SET_CONNECTION_POLICY_PARAMS_LEN);
-	
+
 	// Wait for command complete event
 	SimpleLinkWaitEvent(HCI_CMND_WLAN_IOCTL_SET_CONNECTION_POLICY, &ret);
-	
+
 	return(ret);
 }
 
@@ -571,28 +571,28 @@ wlan_ioctl_set_connection_policy(unsigned long should_connect_to_open_ap,
 //!  @param    ulPriority ulPriority profile priority. Lowest priority:0.
 //!  @param    ulPairwiseCipher_Or_TxKeyLen  key length for WEP security
 //!  @param    ulGroupCipher_TxKeyIndex  key index
-//!  @param    ulKeyMgmt        KEY management 
+//!  @param    ulKeyMgmt        KEY management
 //!  @param    ucPf_OrKey       security key
 //!  @param    ulPassPhraseLen  security key length for WPA\WPA2
 //!
-//!  @return    On success, zero is returned. On error, -1 is returned        
+//!  @return    On success, zero is returned. On error, -1 is returned
 //!
 //!  @brief     When auto start is enabled, the device connects to
-//!             station from the profiles table. Up to 7 profiles are supported. 
-//!             If several profiles configured the device choose the highest 
-//!             priority profile, within each priority group, device will choose 
-//!             profile based on security policy, signal strength, etc 
+//!             station from the profiles table. Up to 7 profiles are supported.
+//!             If several profiles configured the device choose the highest
+//!             priority profile, within each priority group, device will choose
+//!             profile based on security policy, signal strength, etc
 //!             parameters. All the profiles are stored in CC3000 NVMEM.
 //!
-//!  @sa        wlan_ioctl_del_profile 
+//!  @sa        wlan_ioctl_del_profile
 //
 //*****************************************************************************
 
 #ifndef CC3000_TINY_DRIVER
 long
-wlan_add_profile(unsigned long ulSecType, 
+wlan_add_profile(unsigned long ulSecType,
 								 unsigned char* ucSsid,
-								 unsigned long ulSsidLen, 
+								 unsigned long ulSsidLen,
 								 unsigned char *ucBssid,
 								 unsigned long ulPriority,
 								 unsigned long ulPairwiseCipher_Or_TxKeyLen,
@@ -607,12 +607,12 @@ wlan_add_profile(unsigned long ulSecType,
 	long i = 0;
 	unsigned char *args;
 	unsigned char bssid_zero[] = {0, 0, 0, 0, 0, 0};
-	
+
 	ptr = tSLInformation.pucTxCommandBuffer;
 	args = (ptr + HEADERS_SIZE_CMD);
-	
+
 	args = UINT32_TO_STREAM(args, ulSecType);
-	
+
 	// Setup arguments in accordance with the security type
 	switch (ulSecType)
 	{
@@ -632,11 +632,11 @@ wlan_add_profile(unsigned long ulSecType,
 			}
 			args = UINT32_TO_STREAM(args, ulPriority);
 			ARRAY_TO_STREAM(args, ucSsid, ulSsidLen);
-			
+
 			arg_len = WLAN_ADD_PROFILE_NOSEC_PARAM_LEN + ulSsidLen;
 		}
 		break;
-		
+
 		//WEP
 	case WLAN_SEC_WEP:
 		{
@@ -656,20 +656,20 @@ wlan_add_profile(unsigned long ulSecType,
 			args = UINT32_TO_STREAM(args, ulPairwiseCipher_Or_TxKeyLen);
 			args = UINT32_TO_STREAM(args, ulGroupCipher_TxKeyIndex);
 			ARRAY_TO_STREAM(args, ucSsid, ulSsidLen);
-			
+
 			for(i = 0; i < 4; i++)
 			{
 				unsigned char *p = &ucPf_OrKey[i * ulPairwiseCipher_Or_TxKeyLen];
-				
+
 				ARRAY_TO_STREAM(args, p, ulPairwiseCipher_Or_TxKeyLen);
-			}		
-			
-			arg_len = WLAN_ADD_PROFILE_WEP_PARAM_LEN + ulSsidLen + 
+			}
+
+			arg_len = WLAN_ADD_PROFILE_WEP_PARAM_LEN + ulSsidLen +
 				ulPairwiseCipher_Or_TxKeyLen * 4;
-			
+
 		}
 		break;
-		
+
 		//WPA
 		//WPA2
 	case WLAN_SEC_WPA:
@@ -694,27 +694,27 @@ wlan_add_profile(unsigned long ulSecType,
 			args = UINT32_TO_STREAM(args, ulPassPhraseLen);
 			ARRAY_TO_STREAM(args, ucSsid, ulSsidLen);
 			ARRAY_TO_STREAM(args, ucPf_OrKey, ulPassPhraseLen);
-			
+
 			arg_len = WLAN_ADD_PROFILE_WPA_PARAM_LEN + ulSsidLen + ulPassPhraseLen;
 		}
-		
+
 		break;
-	}    
-	
+	}
+
 	// Initiate a HCI command
 	hci_command_send(HCI_CMND_WLAN_IOCTL_ADD_PROFILE,
 									 ptr, arg_len);
-	
+
 	// Wait for command complete event
 	SimpleLinkWaitEvent(HCI_CMND_WLAN_IOCTL_ADD_PROFILE, &ret);
-	
+
 	return(ret);
 }
 #else
 long
-wlan_add_profile(unsigned long ulSecType, 
+wlan_add_profile(unsigned long ulSecType,
 								 unsigned char* ucSsid,
-								 unsigned long ulSsidLen, 
+								 unsigned long ulSsidLen,
 								 unsigned char *ucBssid,
 								 unsigned long ulPriority,
 								 unsigned long ulPairwiseCipher_Or_TxKeyLen,
@@ -733,13 +733,13 @@ wlan_add_profile(unsigned long ulSecType,
 //!
 //!  @param    index   number of profile to delete
 //!
-//!  @return    On success, zero is returned. On error, -1 is returned        
+//!  @return    On success, zero is returned. On error, -1 is returned
 //!
-//!  @brief     Delete WLAN profile 
+//!  @brief     Delete WLAN profile
 //!
 //!  @Note      In order to delete all stored profile, set index to 255.
 //!
-//!  @sa        wlan_add_profile 
+//!  @sa        wlan_add_profile
 //
 //*****************************************************************************
 
@@ -749,21 +749,21 @@ wlan_ioctl_del_profile(unsigned long ulIndex)
 	long ret;
 	unsigned char *ptr;
 	unsigned char *args;
-	
+
 	ptr = tSLInformation.pucTxCommandBuffer;
 	args = (unsigned char *)(ptr + HEADERS_SIZE_CMD);
-	
+
 	// Fill in HCI packet structure
 	args = UINT32_TO_STREAM(args, ulIndex);
 	ret = EFAIL;
-	
+
 	// Initiate a HCI command
 	hci_command_send(HCI_CMND_WLAN_IOCTL_DEL_PROFILE,
 									 ptr, WLAN_DEL_PROFILE_PARAMS_LEN);
-	
+
 	// Wait for command complete event
 	SimpleLinkWaitEvent(HCI_CMND_WLAN_IOCTL_DEL_PROFILE, &ret);
-	
+
 	return(ret);
 }
 
@@ -774,30 +774,30 @@ wlan_ioctl_del_profile(unsigned long ulIndex)
 //!  @param[in]    scan_timeout   parameter not supported
 //!  @param[out]   ucResults  scan results (_wlan_full_scan_results_args_t)
 //!
-//!  @return    On success, zero is returned. On error, -1 is returned        
+//!  @return    On success, zero is returned. On error, -1 is returned
 //!
 //!  @brief    Gets entry from scan result table.
-//!            The scan results are returned one by one, and each entry 
-//!            represents a single AP found in the area. The following is a 
-//!            format of the scan result: 
+//!            The scan results are returned one by one, and each entry
+//!            represents a single AP found in the area. The following is a
+//!            format of the scan result:
 //!        	 - 4 Bytes: number of networks found
 //!          - 4 Bytes: The status of the scan: 0 - aged results,
 //!                     1 - results valid, 2 - no results
 //!          - 42 bytes: Result entry, where the bytes are arranged as  follows:
-//!              
+//!
 //!          				- 1 bit isValid - is result valid or not
-//!         				- 7 bits rssi - RSSI value;	 
+//!         				- 7 bits rssi - RSSI value;
 //!                 - 2 bits: securityMode - security mode of the AP:
 //!                           0 - Open, 1 - WEP, 2 WPA, 3 WPA2
 //!         				- 6 bits: SSID name length
-//!         				- 2 bytes: the time at which the entry has entered into 
+//!         				- 2 bytes: the time at which the entry has entered into
 //!                            scans result table
 //!         				- 32 bytes: SSID name
-//!                 - 6 bytes:	BSSID 
+//!                 - 6 bytes:	BSSID
 //!
 //!  @Note      scan_timeout, is not supported on this version.
 //!
-//!  @sa        wlan_ioctl_set_scan_params 
+//!  @sa        wlan_ioctl_set_scan_params
 //
 //*****************************************************************************
 
@@ -808,20 +808,20 @@ wlan_ioctl_get_scan_results(unsigned long ulScanTimeout,
 {
 	unsigned char *ptr;
 	unsigned char *args;
-	
+
 	ptr = tSLInformation.pucTxCommandBuffer;
 	args = (ptr + HEADERS_SIZE_CMD);
-	
+
 	// Fill in temporary command buffer
 	args = UINT32_TO_STREAM(args, ulScanTimeout);
-	
+
 	// Initiate a HCI command
 	hci_command_send(HCI_CMND_WLAN_IOCTL_GET_SCAN_RESULTS,
 									 ptr, WLAN_GET_SCAN_RESULTS_PARAMS_LEN);
-	
+
 	// Wait for command complete event
 	SimpleLinkWaitEvent(HCI_CMND_WLAN_IOCTL_GET_SCAN_RESULTS, ucResults);
-	
+
 	return(0);
 }
 #endif
@@ -830,36 +830,36 @@ wlan_ioctl_get_scan_results(unsigned long ulScanTimeout,
 //
 //!  wlan_ioctl_set_scan_params
 //!
-//!  @param    uiEnable - start/stop application scan: 
-//!            1 = start scan with default interval value of 10 min. 
-//!            in order to set a different scan interval value apply the value 
+//!  @param    uiEnable - start/stop application scan:
+//!            1 = start scan with default interval value of 10 min.
+//!            in order to set a different scan interval value apply the value
 //!            in milliseconds. minimum 1 second. 0=stop). Wlan reset
 //!           (wlan_stop() wlan_start()) is needed when changing scan interval
 //!            value. Saved: No
-//!  @param   uiMinDwellTime   minimum dwell time value to be used for each 
+//!  @param   uiMinDwellTime   minimum dwell time value to be used for each
 //!           channel, in milliseconds. Saved: yes
 //!           Recommended Value: 100 (Default: 20)
 //!  @param   uiMaxDwellTime    maximum dwell time value to be used for each
 //!           channel, in milliseconds. Saved: yes
 //!           Recommended Value: 100 (Default: 30)
-//!  @param   uiNumOfProbeRequests  max probe request between dwell time. 
+//!  @param   uiNumOfProbeRequests  max probe request between dwell time.
 //!           Saved: yes. Recommended Value: 5 (Default:2)
-//!  @param   uiChannelMask  bitwise, up to 13 channels (0x1fff). 
+//!  @param   uiChannelMask  bitwise, up to 13 channels (0x1fff).
 //!           Saved: yes. Default: 0x7ff
 //!  @param   uiRSSIThreshold   RSSI threshold. Saved: yes (Default: -80)
 //!  @param   uiSNRThreshold    NSR threshold. Saved: yes (Default: 0)
 //!  @param   uiDefaultTxPower  probe Tx power. Saved: yes (Default: 205)
-//!  @param   aiIntervalList    pointer to array with 16 entries (16 channels) 
-//!           each entry (unsigned long) holds timeout between periodic scan 
+//!  @param   aiIntervalList    pointer to array with 16 entries (16 channels)
+//!           each entry (unsigned long) holds timeout between periodic scan
 //!           (connection scan) - in millisecond. Saved: yes. Default 2000ms.
 //!
-//!  @return    On success, zero is returned. On error, -1 is returned        
+//!  @return    On success, zero is returned. On error, -1 is returned
 //!
-//!  @brief    start and stop scan procedure. Set scan parameters. 
+//!  @brief    start and stop scan procedure. Set scan parameters.
 //!
 //!  @Note     uiDefaultTxPower, is not supported on this version.
 //!
-//!  @sa        wlan_ioctl_get_scan_results 
+//!  @sa        wlan_ioctl_get_scan_results
 //
 //*****************************************************************************
 
@@ -876,10 +876,10 @@ wlan_ioctl_set_scan_params(unsigned long uiEnable, unsigned long uiMinDwellTime,
 	unsigned long  uiRes;
 	unsigned char *ptr;
 	unsigned char *args;
-	
+
 	ptr = tSLInformation.pucTxCommandBuffer;
 	args = (ptr + HEADERS_SIZE_CMD);
-	
+
 	// Fill in temporary command buffer
 	args = UINT32_TO_STREAM(args, 36);
 	args = UINT32_TO_STREAM(args, uiEnable);
@@ -890,16 +890,16 @@ wlan_ioctl_set_scan_params(unsigned long uiEnable, unsigned long uiMinDwellTime,
 	args = UINT32_TO_STREAM(args, iRSSIThreshold);
 	args = UINT32_TO_STREAM(args, uiSNRThreshold);
 	args = UINT32_TO_STREAM(args, uiDefaultTxPower);
-	ARRAY_TO_STREAM(args, aiIntervalList, sizeof(unsigned long) * 
+	ARRAY_TO_STREAM(args, aiIntervalList, sizeof(unsigned long) *
 									SL_SET_SCAN_PARAMS_INTERVAL_LIST_SIZE);
-	
+
 	// Initiate a HCI command
 	hci_command_send(HCI_CMND_WLAN_IOCTL_SET_SCANPARAM,
 									 ptr, WLAN_SET_SCAN_PARAMS_LEN);
-	
+
 	// Wait for command complete event
 	SimpleLinkWaitEvent(HCI_CMND_WLAN_IOCTL_SET_SCANPARAM, &uiRes);
-	
+
 	return(uiRes);
 }
 #endif
@@ -919,10 +919,10 @@ wlan_ioctl_set_scan_params(unsigned long uiEnable, unsigned long uiMinDwellTime,
 //!       HCI_EVNT_WLAN_TX_COMPLETE - disable information on end of transmission
 //!   	  Saved: no.
 //!
-//!  @return    On success, zero is returned. On error, -1 is returned        
+//!  @return    On success, zero is returned. On error, -1 is returned
 //!
-//!  @brief    Mask event according to bit mask. In case that event is 
-//!            masked (1), the device will not send the masked event to host. 
+//!  @brief    Mask event according to bit mask. In case that event is
+//!            masked (1), the device will not send the masked event to host.
 //
 //*****************************************************************************
 
@@ -932,19 +932,19 @@ wlan_set_event_mask(unsigned long ulMask)
 	long ret;
 	unsigned char *ptr;
 	unsigned char *args;
-	
-	
+
+
 	if ((ulMask & HCI_EVNT_WLAN_TX_COMPLETE) == HCI_EVNT_WLAN_TX_COMPLETE)
 	{
 		tSLInformation.InformHostOnTxComplete = 0;
-		
+
 		// Since an event is a virtual event - i.e. it is not coming from CC3000
 		// there is no need to send anything to the device if it was an only event
 		if (ulMask == HCI_EVNT_WLAN_TX_COMPLETE)
 		{
 			return 0;
 		}
-		
+
 		ulMask &= ~HCI_EVNT_WLAN_TX_COMPLETE;
 		ulMask |= HCI_EVNT_WLAN_UNSOL_BASE;
 	}
@@ -952,21 +952,21 @@ wlan_set_event_mask(unsigned long ulMask)
 	{
 		tSLInformation.InformHostOnTxComplete = 1;
 	}
-	
+
 	ret = EFAIL;
 	ptr = tSLInformation.pucTxCommandBuffer;
 	args = (unsigned char *)(ptr + HEADERS_SIZE_CMD);
-	
+
 	// Fill in HCI packet structure
 	args = UINT32_TO_STREAM(args, ulMask);
-	
+
 	// Initiate a HCI command
 	hci_command_send(HCI_CMND_EVENT_MASK,
 									 ptr, WLAN_SET_MASK_PARAMS_LEN);
-	
+
 	// Wait for command complete event
 	SimpleLinkWaitEvent(HCI_CMND_EVENT_MASK, &ret);
-	
+
 	return(ret);
 }
 
@@ -974,10 +974,10 @@ wlan_set_event_mask(unsigned long ulMask)
 //
 //!  wlan_ioctl_statusget
 //!
-//!  @param none 
+//!  @param none
 //!
-//!  @return    WLAN_STATUS_DISCONNECTED, WLAN_STATUS_SCANING, 
-//!             STATUS_CONNECTING or WLAN_STATUS_CONNECTED      
+//!  @return    WLAN_STATUS_DISCONNECTED, WLAN_STATUS_SCANING,
+//!             STATUS_CONNECTING or WLAN_STATUS_CONNECTED
 //!
 //!  @brief    get wlan status: disconnected, scanning, connecting or connected
 //
@@ -989,17 +989,17 @@ wlan_ioctl_statusget(void)
 {
 	long ret;
 	unsigned char *ptr;
-	
+
 	ret = EFAIL;
 	ptr = tSLInformation.pucTxCommandBuffer;
-	
+
 	hci_command_send(HCI_CMND_WLAN_IOCTL_STATUSGET,
 									 ptr, 0);
-	
+
 	// Wait for command complete event
 	SimpleLinkWaitEvent(HCI_CMND_WLAN_IOCTL_STATUSGET, &ret);
-	
-	return(ret);    
+
+	return(ret);
 }
 #endif
 
@@ -1009,12 +1009,12 @@ wlan_ioctl_statusget(void)
 //!
 //!  @param    algoEncryptedFlag indicates whether the information is encrypted
 //!
-//!  @return   On success, zero is returned. On error, -1 is returned        
+//!  @return   On success, zero is returned. On error, -1 is returned
 //!
-//!  @brief   Start to acquire device profile. The device acquire its own 
+//!  @brief   Start to acquire device profile. The device acquire its own
 //!           profile, if profile message is found. The acquired AP information
 //!           is stored in CC3000 EEPROM only in case AES128 encryption is used.
-//!           In case AES128 encryption is not used, a profile is created by 
+//!           In case AES128 encryption is not used, a profile is created by
 //!           CC3000 internally.
 //!
 //!  @Note    An asynchronous event - Smart Config Done will be generated as soon
@@ -1030,22 +1030,22 @@ wlan_smart_config_start(unsigned long algoEncryptedFlag)
 	long ret;
 	unsigned char *ptr;
 	unsigned char *args;
-	
+
 	ret = EFAIL;
 	ptr = tSLInformation.pucTxCommandBuffer;
 	args = (unsigned char *)(ptr + HEADERS_SIZE_CMD);
-	
+
 	// Fill in HCI packet structure
 	args = UINT32_TO_STREAM(args, algoEncryptedFlag);
 	ret = EFAIL;
-	
-	hci_command_send(HCI_CMND_WLAN_IOCTL_SIMPLE_CONFIG_START, ptr, 
+
+	hci_command_send(HCI_CMND_WLAN_IOCTL_SIMPLE_CONFIG_START, ptr,
 									 WLAN_SMART_CONFIG_START_PARAMS_LEN);
-	
+
 	// Wait for command complete event
 	SimpleLinkWaitEvent(HCI_CMND_WLAN_IOCTL_SIMPLE_CONFIG_START, &ret);
-	
-	return(ret);    
+
+	return(ret);
 }
 
 //*****************************************************************************
@@ -1054,9 +1054,9 @@ wlan_smart_config_start(unsigned long algoEncryptedFlag)
 //!
 //!  @param    algoEncryptedFlag indicates whether the information is encrypted
 //!
-//!  @return   On success, zero is returned. On error, -1 is returned        
+//!  @return   On success, zero is returned. On error, -1 is returned
 //!
-//!  @brief   Stop the acquire profile procedure 
+//!  @brief   Stop the acquire profile procedure
 //!
 //!  @sa      wlan_smart_config_start , wlan_smart_config_set_prefix
 //
@@ -1067,27 +1067,27 @@ wlan_smart_config_stop(void)
 {
 	long ret;
 	unsigned char *ptr;
-	
+
 	ret = EFAIL;
 	ptr = tSLInformation.pucTxCommandBuffer;
-	
+
 	hci_command_send(HCI_CMND_WLAN_IOCTL_SIMPLE_CONFIG_STOP, ptr, 0);
-	
+
 	// Wait for command complete event
 	SimpleLinkWaitEvent(HCI_CMND_WLAN_IOCTL_SIMPLE_CONFIG_STOP, &ret);
-	
-	return(ret);    
+
+	return(ret);
 }
 
 //*****************************************************************************
 //
 //!  wlan_smart_config_set_prefix
 //!
-//!  @param   newPrefix  3 bytes identify the SSID prefix for the Smart Config. 
+//!  @param   newPrefix  3 bytes identify the SSID prefix for the Smart Config.
 //!
-//!  @return   On success, zero is returned. On error, -1 is returned        
+//!  @return   On success, zero is returned. On error, -1 is returned
 //!
-//!  @brief   Configure station ssid prefix. The prefix is used internally 
+//!  @brief   Configure station ssid prefix. The prefix is used internally
 //!           in CC3000. It should always be TTT.
 //!
 //!  @Note    The prefix is stored in CC3000 NVMEM
@@ -1102,11 +1102,11 @@ wlan_smart_config_set_prefix(char* cNewPrefix)
 	long ret;
 	unsigned char *ptr;
 	unsigned char *args;
-	
+
 	ret = EFAIL;
 	ptr = tSLInformation.pucTxCommandBuffer;
 	args = (ptr + HEADERS_SIZE_CMD);
-	
+
 	if (cNewPrefix == NULL)
 		return ret;
 	else	// with the new Smart Config, prefix must be TTT
@@ -1115,27 +1115,27 @@ wlan_smart_config_set_prefix(char* cNewPrefix)
 		*(cNewPrefix + 1) = 'T';
 		*(cNewPrefix + 2) = 'T';
 	}
-	
+
 	ARRAY_TO_STREAM(args, cNewPrefix, SL_SIMPLE_CONFIG_PREFIX_LENGTH);
-	
-	hci_command_send(HCI_CMND_WLAN_IOCTL_SIMPLE_CONFIG_SET_PREFIX, ptr, 
+
+	hci_command_send(HCI_CMND_WLAN_IOCTL_SIMPLE_CONFIG_SET_PREFIX, ptr,
 									 SL_SIMPLE_CONFIG_PREFIX_LENGTH);
-	
+
 	// Wait for command complete event
 	SimpleLinkWaitEvent(HCI_CMND_WLAN_IOCTL_SIMPLE_CONFIG_SET_PREFIX, &ret);
-	
-	return(ret);    
+
+	return(ret);
 }
 
 //*****************************************************************************
 //
 //!  wlan_smart_config_process
 //!
-//!  @param   none 
+//!  @param   none
 //!
-//!  @return   On success, zero is returned. On error, -1 is returned        
+//!  @return   On success, zero is returned. On error, -1 is returned
 //!
-//!  @brief   process the acquired data and store it as a profile. The acquired 
+//!  @brief   process the acquired data and store it as a profile. The acquired
 //!           AP information is stored in CC3000 EEPROM encrypted.
 //!           The encrypted data is decrypted and stored as a profile.
 //!           behavior is as defined by connection policy.
@@ -1151,13 +1151,13 @@ wlan_smart_config_process()
 	unsigned long ssidLen, keyLen;
 	unsigned char *decKeyPtr;
 	unsigned char *ssidPtr;
-	
+
 	// read the key from EEPROM - fileID 12
 	returnValue = aes_read_key(key);
-	
+
 	if (returnValue != 0)
 		return returnValue;
-	
+
 	// read the received data from fileID #13 and parse it according to the followings:
 	// 1) SSID LEN - not encrypted
 	// 2) SSID - not encrypted
@@ -1168,20 +1168,20 @@ wlan_smart_config_process()
 	//		1) the KEY is 32 bytes long. In this case, the first byte does not represent KEY length
 	//		2) the KEY is 31 bytes long. In this case, the first byte represent KEY length and equals 31
 	returnValue = nvmem_read(NVMEM_SHARED_MEM_FILEID, SMART_CONFIG_PROFILE_SIZE, 0, profileArray);
-	
+
 	if (returnValue != 0)
 		return returnValue;
-	
+
 	ssidPtr = &profileArray[1];
-	
+
 	ssidLen = profileArray[0];
-	
+
 	decKeyPtr = &profileArray[profileArray[0] + 3];
-	
+
 	aes_decrypt(decKeyPtr, key);
 	if (profileArray[profileArray[0] + 1] > 16)
 		aes_decrypt((unsigned char *)(decKeyPtr + 16), key);
-	
+
 	if (*(unsigned char *)(decKeyPtr +31) != 0)
 	{
 		if (*decKeyPtr == 31)
@@ -1199,7 +1199,7 @@ wlan_smart_config_process()
 		keyLen = *decKeyPtr;
 		decKeyPtr++;
 	}
-	
+
 	// add a profile
 	switch (profileArray[profileArray[0] + 2])
 	{
@@ -1211,10 +1211,10 @@ wlan_smart_config_process()
 																		 NULL, 							// BSSID
 																		 1,								// Priority
 																		 0, 0, 0, 0, 0);
-			
+
 			break;
 	 	}
-		
+
 	case WLAN_SEC_WEP://WEP
 		{
 			returnValue = wlan_add_profile(profileArray[profileArray[0] + 2], 	// security type
@@ -1227,10 +1227,10 @@ wlan_smart_config_process()
 																		 0,
 																		 decKeyPtr,						// KEY
 																		 0);
-			
+
 			break;
 		}
-		
+
 	case WLAN_SEC_WPA://WPA
 	case WLAN_SEC_WPA2://WPA2
 		{
@@ -1244,14 +1244,14 @@ wlan_smart_config_process()
 																		 2,								// KEY management
 																		 decKeyPtr,						// KEY
 																		 keyLen);							// KEY length
-			
+
 			break;
 		}
 	}
-	
+
 	return returnValue;
 }
-#endif //CC3000_UNENCRYPTED_SMART_CONFIG		
+#endif //CC3000_UNENCRYPTED_SMART_CONFIG
 
 //*****************************************************************************
 //

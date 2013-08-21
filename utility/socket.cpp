@@ -497,7 +497,7 @@ gethostbyname(const char * hostname, uint8_t usNameLen, uint32_t * out_ip_addr)
 	SimpleLinkWaitEvent(HCI_EVNT_BSD_GETHOSTBYNAME, &ret);
 	
 	errno = ret.retVal;
-	//if (CC3KPrinter != 0) { CC3KPrinter->print("errno: "); CC3KPrinter->println(errno); }
+	//Dprinter->print("errno: "); Dprinter->println(errno);
 	(*((uint32_t *)out_ip_addr)) = ret.outputAddress;
 	
 	return (errno);
