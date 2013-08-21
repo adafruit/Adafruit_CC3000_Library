@@ -23,14 +23,13 @@
 
 #include "debug.h"
 
-
 /**************************************************************************/
 /*!
     @brief  This function will display the number of bytes currently free
             in RAM ... useful for debugging!
 */
 /**************************************************************************/
-void displayFreeRam(void)
+int getFreeRam(void)
 {
   extern int  __bss_end;
   extern int  *__brkval;
@@ -41,18 +40,15 @@ void displayFreeRam(void)
   else {
     free_memory = ((int)&free_memory) - ((int)__brkval);
   }
-  
-  Serial.print(F("Free RAM: "));
-  Serial.print(free_memory);
-  Serial.println(F(" bytes"));
+
+  return free_memory;
 } 
 
 
 void uart_putchar(char c) {
-#ifdef UDR0
-    loop_until_bit_is_set(UCSR0A, UDRE0); /* Wait until data register empty. */
-    UDR0 = c;
-#endif
+  if (CC3KPrinter != 0) {
+    CC3KPrinter->write(c);
+  }
 }
 
 void printDec(uint8_t h) {

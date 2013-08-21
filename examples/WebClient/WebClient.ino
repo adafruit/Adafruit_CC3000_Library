@@ -65,7 +65,7 @@ void setup(void)
   Serial.begin(115200);
   Serial.println(F("Hello, CC3000!\n")); 
 
-  displayFreeRam();
+  Serial.print("Free RAM: "); Serial.println(getFreeRam(), DEC);
   
   /* Initialise the module */
   Serial.println(F("\nInitializing..."));

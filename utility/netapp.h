@@ -347,5 +347,7 @@ long netapp_set_debug_level(unsigned long ulLevel);
 }
 #endif // __cplusplus
 
+extern Print* CC3KPrinter;
+
 #endif	// __NETAPP_H__
 

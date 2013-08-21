@@ -135,9 +135,11 @@ class Adafruit_CC3000 {
     bool     scanSSIDs(uint32_t time);
     #endif
 
+    void setPrinter(Print*);
+
   private:
     bool _initialised;
 
 };
 
-
+extern Print* CC3KPrinter;

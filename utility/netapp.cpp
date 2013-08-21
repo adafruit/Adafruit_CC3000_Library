@@ -256,8 +256,11 @@ netapp_ping_send(uint32_t *ip, uint32_t ulPingAttempts, uint32_t ulPingSize, uin
 	args = UINT32_TO_STREAM(args, ulPingTimeout);
 
 	/*
-	for(uint8_t i=0; i<4+4+4+4; i++) {
-	  Serial.print(" 0x"); Serial.print( (ptr + HEADERS_SIZE_CMD)[i], HEX);
+	if (CC3KPrinter != 0)
+		{
+		for(uint8_t i=0; i<4+4+4+4; i++) {
+		  CC3KPrinter->print(" 0x"); CC3KPrinter->( (ptr + HEADERS_SIZE_CMD)[i], HEX);
+		}
 	}
 	*/
 

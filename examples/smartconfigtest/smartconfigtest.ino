@@ -57,7 +57,7 @@ void setup(void)
   Serial.println(F("Hello, CC3000!\n")); 
 
   displayDriverMode();
-  displayFreeRam();
+  Serial.print("Free RAM: "); Serial.println(getFreeRam(), DEC);
   
   /* Initialise the module */
   Serial.println(F("\nInitialising the CC3000 ..."));

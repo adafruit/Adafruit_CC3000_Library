@@ -84,7 +84,7 @@ void setup(void) {
   Serial.begin(115200);
   Serial.println(F("Hello, CC3000!"));
 
-  displayFreeRam();
+  Serial.print("Free RAM: "); Serial.println(getFreeRam(), DEC);
 
   Serial.print(F("Initializing..."));
   if(!cc3000.begin()) {
