@@ -185,7 +185,8 @@ Adafruit_CC3000::Adafruit_CC3000(uint8_t csPin, uint8_t irqPin, uint8_t vbatPin,
   #if defined(UDR0) || defined(UDR1)
   CC3KPrinter = &Serial;
   #else
-  #error no default serial port found
+  CC3KPrinter = 0;
+  // no default serial port found
   #endif
 }
 
@@ -202,6 +203,7 @@ Adafruit_CC3000::Adafruit_CC3000(uint8_t csPin, uint8_t irqPin, uint8_t vbatPin,
 /**************************************************************************/
 bool Adafruit_CC3000::begin(uint8_t patchReq)
 {
+  #ifndef CORE_ADAX
   // determine irq #
   for (uint8_t i=0; i<sizeof(dreqinttable); i+=2) {
     if (g_irqPin == dreqinttable[i]) {
@@ -214,6 +216,10 @@ bool Adafruit_CC3000::begin(uint8_t patchReq)
     }
     return false;
   }
+  #else
+  g_IRQnum = g_irqPin;
+  // (almost) every single pin on Xmega supports interrupt
+  #endif
 
   init_spi();
 
