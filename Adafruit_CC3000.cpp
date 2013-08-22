@@ -32,7 +32,6 @@
 #include "utility/socket.h"
 #include "utility/wlan.h"
 #include "utility/debug.h"
-#include "utility/sntp.h"
 
 uint8_t g_csPin, g_irqPin, g_vbatPin, g_IRQnum, g_SPIspeed;
 
