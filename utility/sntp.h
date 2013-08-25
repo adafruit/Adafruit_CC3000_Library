@@ -361,10 +361,10 @@ class sntp
 {
   public:
 	sntp();
- 	sntp(char* ntp_server_url1, short local_utc_offset, bool twelve_hour);
- 	sntp(char* ntp_server_url1, char* ntp_server_url2, short local_utc_offset, bool twelve_hour);
- 	sntp(char* ntp_server_url1, short local_utc_offset, short dst_utc_offset, bool twelve_hour, bool enable_dst);
-	sntp(char* ntp_server_url1, char* ntp_server_url2, short local_utc_offset, short dst_utc_offset, bool twelve_hour, bool enable_dst);
+ 	sntp(char* ntp_server_url1, short local_utc_offset);
+ 	sntp(char* ntp_server_url1, char* ntp_server_url2, short local_utc_offset);
+ 	sntp(char* ntp_server_url1, short local_utc_offset, short dst_utc_offset, bool enable_dst);
+	sntp(char* ntp_server_url1, char* ntp_server_url2, short local_utc_offset, short dst_utc_offset, bool enable_dst);
 	
 	virtual ~sntp() {};
 		

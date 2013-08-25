@@ -51,17 +51,56 @@ Adafruit_CC3000 cc3000 = Adafruit_CC3000(ADAFRUIT_CC3000_CS, ADAFRUIT_CC3000_IRQ
 //	2 - Secondary Network Time Server URL (also can be NULL)
 //	3 - Local UTC offset in minutes (US Eastern Time is UTC - 5:00
 //	4 - Local UTC offset in minutes for Daylight Savings Time (US Eastern DST is UTC - 4:00
-//	5 - Enable 12-hour mode. true: 12-hour mode, false: 24-hour mode
-//	6 - Enable Daylight Savings Time adjustment (not implemented yet)
+//	5 - Enable Daylight Savings Time adjustment (not implemented yet)
 //
-sntp mysntp = sntp(NULL, "time.nist.gov", (short)(-5 * 60), (short)(-4 * 60), true, true);
+sntp mysntp = sntp(NULL, "time.nist.gov", (short)(-5 * 60), (short)(-4 * 60), true);
 
 // Type SNTP_Timestamp is 64-bit NTP time. High-order 32-bits is seconds since 1/1/1900
 //   Low order 32-bits is fractional seconds
 SNTP_Timestamp_t now;
 
-// Type NetTime_t contains NTP time broken out to human-oriented values://	uint16_t millis; ///< Milliseconds after the second (0..999)//	uint8_t	 sec;    ///< Seconds after the minute (0..59)//	uint8_t	 min;    ///< Minutes after the hour (0..59)//	uint8_t	 hour;   ///< Hours since midnight (0..23)//	uint8_t	 mday;   ///< Day of the month (1..31)//	uint8_t	 mon;    ///< Months since January (0..11)//	uint16_t year;   ///< Year.//	uint8_t	 wday;	 ///< Days since Sunday (0..6)//	uint8_t	 yday;   ///< Days since January 1 (0..365)//	bool	 isdst;  ///< Daylight savings time flag, currently not supported	
+// Type NetTime_t contains NTP time broken out to human-oriented values:
+//	uint16_t millis; ///< Milliseconds after the second (0..999)
+//	uint8_t	 sec;    ///< Seconds after the minute (0..59)
+//	uint8_t	 min;    ///< Minutes after the hour (0..59)
+//	uint8_t	 hour;   ///< Hours since midnight (0..23)
+//	uint8_t	 mday;   ///< Day of the month (1..31)
+//	uint8_t	 mon;    ///< Months since January (0..11)
+//	uint16_t year;   ///< Year.
+//	uint8_t	 wday;	 ///< Days since Sunday (0..6)
+//	uint8_t	 yday;   ///< Days since January 1 (0..365)
+//	bool	 isdst;  ///< Daylight savings time flag, currently not supported	
 NetTime_t timeExtract;
+
+#define pF(string_pointer) (reinterpret_cast<const __FlashStringHelper *>(pgm_read_word(string_pointer)))
+
+prog_char   janStr[] PROGMEM = "January";
+prog_char   febStr[] PROGMEM = "February";
+prog_char   marStr[] PROGMEM = "March";
+prog_char   aprStr[] PROGMEM = "April";
+prog_char   mayStr[] PROGMEM = "May";
+prog_char   junStr[] PROGMEM = "June";
+prog_char   julStr[] PROGMEM = "July";
+prog_char   augStr[] PROGMEM = "August";
+prog_char   sepStr[] PROGMEM = "September";
+prog_char   octStr[] PROGMEM = "October";
+prog_char   novStr[] PROGMEM = "November";
+prog_char   decStr[] PROGMEM = "December"; 
+
+PROGMEM const char* monthStrs[] = { janStr, febStr, marStr, aprStr, mayStr, junStr,
+                                    julStr, augStr, sepStr, octStr, novStr, decStr}; 
+
+prog_char   sunStr[] PROGMEM = "Sunday";
+prog_char   monStr[] PROGMEM = "Monday";
+prog_char   tueStr[] PROGMEM = "Tuesday";
+prog_char   wedStr[] PROGMEM = "Wednesday";
+prog_char   thuStr[] PROGMEM = "Thursday";
+prog_char   friStr[] PROGMEM = "Friday";
+prog_char   satStr[] PROGMEM = "Saturday"; 
+
+PROGMEM const char* dayStrs[] = { sunStr, monStr, tueStr,  wedStr,
+                                  thuStr, friStr, satStr};
+
 
 /**************************************************************************/
 /*!
@@ -75,7 +114,8 @@ void setup(void)
   Serial.println(F("Hello, CC3000!\n")); 
 
   displayFreeRam();
-  
+
+ 
   /* Initialise the module */
   Serial.println(F("\nInitialising the CC3000 ..."));
   if (!cc3000.begin())
@@ -129,8 +169,8 @@ void setup(void)
   mysntp.ExtractNTPTime(mysntp.NTPGetTime(&now, true), &timeExtract);
 
   Serial.print(timeExtract.hour); Serial.print(F(":")); Serial.print(timeExtract.min); Serial.print(F(":"));Serial.print(timeExtract.sec); Serial.print(F("."));Serial.println(timeExtract.millis);
-  Serial.print(timeExtract.mon); Serial.print(F("-")); Serial.print(timeExtract.mday); Serial.print(F("-"));Serial.println(timeExtract.year);
-  Serial.print(F("Day of week: ")); Serial.print(timeExtract.wday); Serial.print(F(", day of year: ")); Serial.println(timeExtract.yday); 
+  Serial.print(pF(&dayStrs[timeExtract.wday])); Serial.print(F(", ")); Serial.print(pF(&monthStrs[timeExtract.mon])); Serial.print(F(" ")); Serial.print(timeExtract.mday); Serial.print(F(", "));Serial.println(timeExtract.year);
+  Serial.print(F("Day of year: ")); Serial.println(timeExtract.yday); 
 
   /* You need to make sure to clean up after yourself or the CC3000 can freak out */
   /* the next time you try to connect ... */

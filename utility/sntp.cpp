@@ -314,7 +314,7 @@ sntp::sntp()
 	//m_userServers[0] = (char*)&m_userServerStrings[1];
 }
 
-sntp::sntp(char* ntp_server_url1, char* ntp_server_url2, short local_utc_offset, short dst_utc_offset, bool twelve_hour, bool enable_dst)
+sntp::sntp(char* ntp_server_url1, char* ntp_server_url2, short local_utc_offset, short dst_utc_offset, bool enable_dst)
 {
 	int user_server_count = 0;
 	
@@ -323,7 +323,6 @@ sntp::sntp(char* ntp_server_url1, char* ntp_server_url2, short local_utc_offset,
 	m_std_UTC_offset.seconds = (uint32_t)(60L * local_utc_offset);
 	m_dst_UTC_offset.seconds = (uint32_t)(60L * dst_utc_offset);
 	m_cur_UTC_offset = &m_dst_UTC_offset;
-	m_twelveHour = twelve_hour;
 	m_enable_dst = enable_dst;
 	if (ntp_server_url1)
 	{
@@ -338,17 +337,17 @@ sntp::sntp(char* ntp_server_url1, char* ntp_server_url2, short local_utc_offset,
 		user_server_count++;
 	}
 }
-sntp::sntp(char* ntp_server_url1, short local_utc_offset, bool twelve_hour)
+sntp::sntp(char* ntp_server_url1, short local_utc_offset)
 {
-	sntp(ntp_server_url1, NULL, local_utc_offset, 0, twelve_hour, false);
+	sntp(ntp_server_url1, NULL, local_utc_offset, 0, false);
 }	
-sntp::sntp(char* ntp_server_url1, char* ntp_server_url2, short local_utc_offset, bool twelve_hour)
+sntp::sntp(char* ntp_server_url1, char* ntp_server_url2, short local_utc_offset)
 {
-	sntp(ntp_server_url1, ntp_server_url2, local_utc_offset, 0, twelve_hour, false);
+	sntp(ntp_server_url1, ntp_server_url2, local_utc_offset, 0, false);
 }	
-sntp::sntp(char* ntp_server_url1, short local_utc_offset, short dst_utc_offset, bool twelve_hour, bool enable_dst)
+sntp::sntp(char* ntp_server_url1, short local_utc_offset, short dst_utc_offset, bool enable_dst)
 {
-	sntp(ntp_server_url1, NULL, local_utc_offset, dst_utc_offset, twelve_hour, enable_dst);	
+	sntp(ntp_server_url1, NULL, local_utc_offset, dst_utc_offset, enable_dst);	
 }
 
 //To spread the load of NTP client request, ntp.org maintains DNS servers that will return a list of
