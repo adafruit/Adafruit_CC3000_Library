@@ -65,7 +65,7 @@ netapp_pingreport_args_t pingReport;
 #define CHECK_SUCCESS(func,Notify,errorCode)  {if ((func) != CC3000_SUCCESS) {Serial.println(F(Notify)); return errorCode;}}
 
 #define MAXSSID					  (32)
-#define MAXLENGTHKEY 			(16)  /* Hard coded to 16 in the API! :( */
+#define MAXLENGTHKEY 			(32)  /* Cleared for 32 bytes by TI engineering 29/08/13 */
 
 #define MAX_SOCKETS 32  // can change this
 boolean closed_sockets[MAX_SOCKETS] = {false, false, false, false};
