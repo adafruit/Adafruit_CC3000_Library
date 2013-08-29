@@ -116,11 +116,12 @@ void setup(void)
   /* Try connecting to the website */
   Adafruit_CC3000_Client www = cc3000.connectTCP(ip, 80);
   if (www.connected()) {
-    www.print(F("GET "));
-    www.print(WEBPAGE);
-    www.print(F(" HTTP/1.0\r\n"));
-    www.print(F("Host: ")); www.println(WEBSITE);
-    www.println(F("Connection: close"));
+    www.fastrprint(F("GET "));
+    www.fastrprint(WEBPAGE);
+    www.fastrprint(F(" HTTP/1.0\r\n"));
+    www.fastrprint(F("Host: ")); www.fastrprint(WEBSITE); www.fastrprint(F("\n"));
+    www.fastrprint(F("Connection: close\n"));
+    www.fastrprint(F("\n"));
     www.println();
   } else {
     Serial.println(F("Connection failed"));    
