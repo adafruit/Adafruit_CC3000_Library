@@ -148,6 +148,10 @@ typedef long int __fd_mask;
 #define __FDELT(d)              ((d) / __NFDBITS)
 #define __FDMASK(d)             ((__fd_mask) 1 << ((d) % __NFDBITS))
 
+#ifdef fd_set
+#undef fd_set  // for compatibility with newlib, which defines fd_set
+#endif
+
 // fd_set for select and pselect.
 typedef struct
 {
