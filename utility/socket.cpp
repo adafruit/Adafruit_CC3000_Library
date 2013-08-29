@@ -469,7 +469,7 @@ listen(long sd, long backlog)
 
 #ifndef CC3000_TINY_DRIVER
 int 
-gethostbyname(char * hostname, uint8_t usNameLen, uint32_t * out_ip_addr)
+gethostbyname(const char * hostname, uint8_t usNameLen, uint32_t * out_ip_addr)
 {
 	tBsdGethostbynameParams ret;
 	unsigned char *ptr, *args;

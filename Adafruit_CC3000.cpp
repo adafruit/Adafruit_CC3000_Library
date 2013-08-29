@@ -774,7 +774,7 @@ bool Adafruit_CC3000::startSmartConfig(bool enableAES)
     @returns  False if an error occured!
 */
 /**************************************************************************/
-bool Adafruit_CC3000::connectOpen(char *ssid)
+bool Adafruit_CC3000::connectOpen(const char *ssid)
 {
   if (!_initialised) {
     return false;
@@ -785,7 +785,7 @@ bool Adafruit_CC3000::connectOpen(char *ssid)
                  "Failed to set connection policy", false);
     delay(500);
     CHECK_SUCCESS(wlan_connect(WLAN_SEC_UNSEC,
-			       (char*)ssid, strlen(ssid),
+			       (const char*)ssid, strlen(ssid),
 			       0 ,NULL,0),
                   "SSID connection failed", false);
   #else
@@ -866,7 +866,7 @@ void CC3000_UsynchCallback(long lEventType, char * data, unsigned char length)
 */
 /**************************************************************************/
 #ifndef CC3000_TINY_DRIVER
-bool Adafruit_CC3000::connectSecure(char *ssid, char *key, int32_t secMode)
+bool Adafruit_CC3000::connectSecure(const char *ssid, const char *key, int32_t secMode)
 {
   int8_t  _key[MAXLENGTHKEY];
   uint8_t _ssid[MAXSSID];
@@ -908,7 +908,7 @@ bool Adafruit_CC3000::connectSecure(char *ssid, char *key, int32_t secMode)
 #endif
 
 // Connect with timeout
-void Adafruit_CC3000::connectToAP(char *ssid, char *key, uint8_t secmode) {
+void Adafruit_CC3000::connectToAP(const char *ssid, const char *key, uint8_t secmode) {
   int16_t timer = WLAN_CONNECT_TIMEOUT;
 
   do {  
