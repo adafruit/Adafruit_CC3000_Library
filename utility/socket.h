@@ -110,6 +110,9 @@ extern "C" {
 
 #define  IOCTL_SOCKET_EVENTMASK
 
+#ifdef ENOBUFS
+#undef ENOBUFS
+#endif
 #define ENOBUFS                 55          // No buffer space available
 
 #define __FD_SETSIZE            32
@@ -173,6 +176,18 @@ typedef struct
 #define __FD_ISSET(d, set)     (__FDS_BITS (set)[__FDELT (d)] & __FDMASK (d))
 
 // Access macros for 'fd_set'.
+#ifdef FD_SET
+#undef FD_SET
+#endif
+#ifdef FD_CLR
+#undef FD_CLR
+#endif
+#ifdef FD_ISSET
+#undef FD_ISSET
+#endif
+#ifdef FD_ZERO
+#undef FD_ZERO
+#endif
 #define FD_SET(fd, fdsetp)      __FD_SET (fd, fdsetp)
 #define FD_CLR(fd, fdsetp)      __FD_CLR (fd, fdsetp)
 #define FD_ISSET(fd, fdsetp)    __FD_ISSET (fd, fdsetp)
