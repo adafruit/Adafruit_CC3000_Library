@@ -7,7 +7,7 @@
 //Lists of pool servers
 
 
-char* ntp_us_pool_list[] =  {	"0.us.pool.ntp.org",
+const char* ntp_us_pool_list[] =  {	"0.us.pool.ntp.org",
 								"1.us.pool.ntp.org",
 								"2.us.pool.ntp.org",
 								"3.us.pool.ntp.org",
@@ -18,7 +18,7 @@ char* ntp_us_pool_list[] =  {	"0.us.pool.ntp.org",
 								NULL
 							};
 
-char* ntp_global_pool_list[] =  {   "0.pool.ntp.org",
+const char* ntp_global_pool_list[] =  {   "0.pool.ntp.org",
 									"1.pool.ntp.org",
 									"2.pool.ntp.org",
 									"pool.ntp.org",
@@ -353,10 +353,10 @@ sntp::sntp(char* ntp_server_url1, short local_utc_offset, short dst_utc_offset, 
 //To spread the load of NTP client request, ntp.org maintains DNS servers that will return a list of
 // available NTP servers from a pool.  This routine gets a list of servers from the specified pool
 // and returns it, along with a count of the servers in the list.
-char sntp::GetNTPServerList(char** ntp_pool_list, uint32_t* addrBuffer, int maxServerCount)
+char sntp::GetNTPServerList(const char** ntp_pool_list, uint32_t* addrBuffer, int maxServerCount)
 {
 	uint32_t			 ntpServer= NULL;
-	char               **ntpPoolName;
+	const char           **ntpPoolName;
 	uint8_t              serverCount = 0;
 
 	if ((ntp_pool_list) && (addrBuffer))

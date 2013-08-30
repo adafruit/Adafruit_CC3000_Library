@@ -36,7 +36,7 @@
 
 uint8_t g_csPin, g_irqPin, g_vbatPin, g_IRQnum, g_SPIspeed;
 
-static uint8_t dreqinttable[] = {
+static const uint8_t dreqinttable[] = {
 #if defined(__AVR_ATmega168__) || defined(__AVR_ATmega328P__) || defined (__AVR_ATmega328__) || defined(__AVR_ATmega8__) 
   2, 0,
   3, 1,
@@ -47,6 +47,28 @@ static uint8_t dreqinttable[] = {
   20, 3,
   19, 4,
   18, 5,
+#elif  defined(__AVR_ATmega32u4__) && defined(CORE_TEENSY)
+  5, 0,
+  6, 1,
+  7, 2,
+  8, 3,
+#elif  defined(__AVR_AT90USB1286__) && defined(CORE_TEENSY)
+  0, 0,
+  1, 1,
+  2, 2,
+  3, 3,
+  36, 4,
+  37, 5,
+  18, 6,
+  19, 7,
+#elif  defined(__arm__) && defined(CORE_TEENSY)
+  0, 0, 1, 1, 2, 2, 3, 3, 4, 4,
+  5, 5, 6, 6, 7, 7, 8, 8, 9, 9,
+  10, 10, 11, 11, 12, 12, 13, 13, 14, 14,
+  15, 15, 16, 16, 17, 17, 18, 18, 19, 19,
+  20, 20, 21, 21, 22, 22, 23, 23, 24, 24,
+  25, 25, 26, 26, 27, 27, 28, 28, 29, 29,
+  30, 30, 31, 31, 32, 32, 33, 33,
 #elif  defined(__AVR_ATmega32u4__) 
   7, 4,
   3, 0,
@@ -752,7 +774,7 @@ bool Adafruit_CC3000::startSmartConfig(bool enableAES)
     @returns  False if an error occured!
 */
 /**************************************************************************/
-bool Adafruit_CC3000::connectOpen(char *ssid)
+bool Adafruit_CC3000::connectOpen(const char *ssid)
 {
   if (!_initialised) {
     return false;
@@ -763,7 +785,7 @@ bool Adafruit_CC3000::connectOpen(char *ssid)
                  "Failed to set connection policy", false);
     delay(500);
     CHECK_SUCCESS(wlan_connect(WLAN_SEC_UNSEC,
-			       (char*)ssid, strlen(ssid),
+			       (const char*)ssid, strlen(ssid),
 			       0 ,NULL,0),
                   "SSID connection failed", false);
   #else
@@ -844,7 +866,7 @@ void CC3000_UsynchCallback(long lEventType, char * data, unsigned char length)
 */
 /**************************************************************************/
 #ifndef CC3000_TINY_DRIVER
-bool Adafruit_CC3000::connectSecure(char *ssid, char *key, int32_t secMode)
+bool Adafruit_CC3000::connectSecure(const char *ssid, const char *key, int32_t secMode)
 {
   int8_t  _key[MAXLENGTHKEY];
   uint8_t _ssid[MAXSSID];
@@ -886,7 +908,7 @@ bool Adafruit_CC3000::connectSecure(char *ssid, char *key, int32_t secMode)
 #endif
 
 // Connect with timeout
-void Adafruit_CC3000::connectToAP(char *ssid, char *key, uint8_t secmode) {
+void Adafruit_CC3000::connectToAP(const char *ssid, const char *key, uint8_t secmode) {
   int16_t timer = WLAN_CONNECT_TIMEOUT;
 
   do {  

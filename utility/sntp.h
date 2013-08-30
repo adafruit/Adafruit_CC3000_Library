@@ -335,7 +335,7 @@ typedef struct SNTP_Message_t
 	//   uint8_t                messageDigest[128];   //optional field - ignore
 }SNTP_Message_t;
 
-typedef char** NTP_Pool_t;								//Name of NTP server pool
+typedef const char** NTP_Pool_t;							//Name of NTP server pool
 typedef uint32_t  NTP_Server_List_t[MAX_NTP_SERVERS];   //list of ntp server addresses (as returned by NTP server pool)
 
 /**
@@ -376,7 +376,7 @@ class sntp
 	int					GetSystemClockAsNTPTime(SNTP_Timestamp_t* ntpSystemTime);
 	
   private:
-	char				GetNTPServerList(char** ntp_pool_list, uint32_t* addrBuffer, int maxServerCount);
+	char				GetNTPServerList(const char** ntp_pool_list, uint32_t* addrBuffer, int maxServerCount);
 	bool				SNTP_GetTime(int sntpSocket, uint32_t *ntpServerAddr);
 
 	NetTime_t			m_timeStruct;
@@ -395,7 +395,7 @@ class sntp
 	NTP_Pool_t			m_localPool;					//list of pool servers for current geographical location
 	NTP_Pool_t			m_globalPool;					//list of global pool servers if no local servers respond
 	uint8_t				m_userServerCount;				//number of NTP servers provded by user (not pool servers)
-	char*				m_userServers[MAX_NTP_SERVERS];	//list of NTP or NTP pool servers provided by user (pointers to userServerStrings)
+	const char*			m_userServers[MAX_NTP_SERVERS];	//list of NTP or NTP pool servers provided by user (pointers to userServerStrings)
 	char				m_userServerStrings[MAX_NTP_SERVERS][MAX_URL_NAME+1]; //storage for user's NTP server URL strings
 
     bool				m_timeIsSet;					//false = current time is not set

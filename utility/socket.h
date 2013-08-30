@@ -110,6 +110,9 @@ extern "C" {
 
 #define  IOCTL_SOCKET_EVENTMASK
 
+#ifdef ENOBUFS
+#undef ENOBUFS
+#endif
 #define ENOBUFS                 55          // No buffer space available
 
 #define __FD_SETSIZE            32
@@ -148,6 +151,10 @@ typedef long int __fd_mask;
 #define __FDELT(d)              ((d) / __NFDBITS)
 #define __FDMASK(d)             ((__fd_mask) 1 << ((d) % __NFDBITS))
 
+#ifdef fd_set
+#undef fd_set  // for compatibility with newlib, which defines fd_set
+#endif
+
 // fd_set for select and pselect.
 typedef struct
 {
@@ -169,6 +176,18 @@ typedef struct
 #define __FD_ISSET(d, set)     (__FDS_BITS (set)[__FDELT (d)] & __FDMASK (d))
 
 // Access macros for 'fd_set'.
+#ifdef FD_SET
+#undef FD_SET
+#endif
+#ifdef FD_CLR
+#undef FD_CLR
+#endif
+#ifdef FD_ISSET
+#undef FD_ISSET
+#endif
+#ifdef FD_ZERO
+#undef FD_ZERO
+#endif
 #define FD_SET(fd, fdsetp)      __FD_SET (fd, fdsetp)
 #define FD_CLR(fd, fdsetp)      __FD_CLR (fd, fdsetp)
 #define FD_ISSET(fd, fdsetp)    __FD_ISSET (fd, fdsetp)
@@ -354,7 +373,7 @@ extern long listen(long sd, long backlog);
 //
 //*****************************************************************************
 #ifndef CC3000_TINY_DRIVER 
-extern int gethostbyname(char * hostname, uint8_t usNameLen, uint32_t* out_ip_addr);
+extern int gethostbyname(const char * hostname, uint8_t usNameLen, uint32_t* out_ip_addr);
 #endif
 
 
