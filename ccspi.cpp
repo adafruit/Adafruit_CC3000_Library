@@ -89,7 +89,10 @@ uint8_t ccspi_mySPICTRL, ccspi_oldSPICTRL;
 #define SpiConfigPop()			do { SPCR = ccspi_oldSPICTRL; } while (0)
 #else
 // TODO: ARM (Due, Teensy 3.0, etc)
-#error platform not yet supported by Adafruit_CC3000
+// #error platform not yet supported by Adafruit_CC3000
+#define SpiConfigStore()		do {  } while (0)
+#define SpiConfigPush()			do {  } while (0)
+#define SpiConfigPop()			do {  } while (0)
 #endif
 
 /* smartconfig flags (defined in Adafruit_CC3000.cpp) */
