@@ -67,9 +67,6 @@ extern uint8_t g_csPin, g_irqPin, g_vbatPin, g_IRQnum, g_SPIspeed;
 #define eSPI_STATE_READ_FIRST_PORTION   (7)
 #define eSPI_STATE_READ_EOT             (8)
 
-#define CC3000_ASSERT_CS                digitalWrite(g_csPin, LOW);
-#define CC3000_DEASSERT_CS              digitalWrite(g_csPin, HIGH);
-
 /*
 these variables store the SPI configuration
 so they can be modified and restored
@@ -79,21 +76,47 @@ and in different modes
 */
 #if defined(SPI2X) // most likely AVR8
 uint8_t ccspi_mySPCR, ccspi_mySPSR, ccspi_oldSPSR, ccspi_oldSPCR;
-#define SpiConfigStore()		do { ccspi_mySPCR = SPCR; ccspi_mySPSR = SPSR & _BV(SPI2X); } while (0)
-#define SpiConfigPush()			do { ccspi_oldSPCR = SPCR; ccspi_oldSPSR = SPSR & _BV(SPI2X); SPCR = ccspi_mySPCR; SPSR |= ccspi_mySPSR & _BV(SPI2X); } while (0)
-#define SpiConfigPop()			do { SPCR = ccspi_oldSPCR; SPSR |= ccspi_oldSPSR & _BV(SPI2X); } while (0)
+#define SpiConfigStoreOld() {             \
+  ccspi_oldSPCR = SPCR;                   \
+  ccspi_oldSPSR = SPSR & _BV(SPI2X); }
+#define SpiConfigStoreMy() {              \
+  ccspi_mySPCR  = SPCR;                   \
+  ccspi_mySPSR  = SPSR & _BV(SPI2X); }
+#define SpiConfigPush()	{                 \
+  ccspi_oldSPCR = SPCR;                   \
+  ccspi_oldSPSR = SPSR & _BV(SPI2X);      \
+  SPCR          = ccspi_mySPCR;           \
+  if(ccspi_mySPSR)  SPSR |=  _BV(SPI2X);  \
+  else              SPSR &= ~_BV(SPI2X); }
+#define SpiConfigPop() {                  \
+  SPCR = ccspi_oldSPCR;                   \
+  if(ccspi_oldSPSR) SPSR |=  _BV(SPI2X);  \
+  else              SPSR &= ~_BV(SPI2X); }
+
 #elif defined(__AVR_XMEGA__) // most likely XMEGA
 uint8_t ccspi_mySPICTRL, ccspi_oldSPICTRL;
-#define SpiConfigStore()		do { ccspi_mySPICTRL = SPCR; } while (0)
+#define SpiConfigStoreOld()		do { ccspi_oldSPICTRL = SPCR; } while (0)
+#define SpiConfigStoreMy()		do { ccspi_mySPICTRL = SPCR; } while (0)
 #define SpiConfigPush()			do { ccspi_oldSPICTRL = SPCR; SPCR = ccspi_mySPICTRL; } while (0)
 #define SpiConfigPop()			do { SPCR = ccspi_oldSPICTRL; } while (0)
 #else
 // TODO: ARM (Due, Teensy 3.0, etc)
 // #error platform not yet supported by Adafruit_CC3000
-#define SpiConfigStore()		do {  } while (0)
+#define SpiConfigStoreOld()		do {  } while (0)
+#define SpiConfigStoreMy()		do {  } while (0)
 #define SpiConfigPush()			do {  } while (0)
 #define SpiConfigPop()			do {  } while (0)
 #endif
+
+// CC3000 chip select + SPI config
+#define CC3000_ASSERT_CS {     \
+  digitalWrite(g_csPin, LOW);  \
+  SpiConfigPush(); }
+// CC3000 chip deselect + SPI restore
+#define CC3000_DEASSERT_CS {   \
+  digitalWrite(g_csPin, HIGH); \
+  SpiConfigPop(); }
+
 
 /* smartconfig flags (defined in Adafruit_CC3000.cpp) */
 // extern unsigned long ulSmartConfigFinished, ulCC3000DHCP;
@@ -209,13 +232,14 @@ int init_spi(void)
   digitalWrite(g_vbatPin, 0);
   delay(500);
 
-  /* Set CS pin to output */
+  /* Set CS pin to output (don't de-assert yet) */
   pinMode(g_csPin, OUTPUT);
-  CC3000_DEASSERT_CS;
 
   /* Set interrupt/gpio pin to input */
   pinMode(g_irqPin, INPUT);
   digitalWrite(g_irqPin, HIGH); // w/weak pullup
+
+  SpiConfigStoreOld(); // prime ccspi_old* values for DEASSERT
 
   /* Initialise SPI (Mode 1) */
   SPI.begin();
@@ -223,7 +247,12 @@ int init_spi(void)
   SPI.setBitOrder(MSBFIRST);
   SPI.setClockDivider(g_SPIspeed);
   
-  SpiConfigStore();
+  SpiConfigStoreMy(); // prime ccspi_my* values for ASSERT
+
+  // Newly-initialized SPI is in the same state that ASSERT_CS will set it
+  // to.  Invoke DEASSERT (which also restores SPI registers) so the next
+  // ASSERT call won't clobber the ccspi_old* values -- we need those!
+  CC3000_DEASSERT_CS;
 
   /* ToDo: Configure IRQ interrupt! */
 
@@ -321,8 +350,6 @@ long SpiWrite(unsigned char *pUserBuffer, unsigned short usLength)
     /* Assert the CS line and wait till SSI IRQ line is active and then initialize write operation */
     CC3000_ASSERT_CS;
 
-    SpiConfigPush();
-
     /* Re-enable IRQ - if it was not disabled - this is not a problem... */
     tSLInformation.WlanInterruptEnable();
 
@@ -333,7 +360,6 @@ long SpiWrite(unsigned char *pUserBuffer, unsigned short usLength)
 
       sSpiInformation.ulSpiState = eSPI_STATE_IDLE;
 
-      SpiConfigPop();
       CC3000_DEASSERT_CS;
     }
   }
@@ -680,8 +706,6 @@ void SPI_IRQ(void)
     sSpiInformation.ulSpiState = eSPI_STATE_READ_IRQ;    
     /* IRQ line goes down - start reception */
 
-    SpiConfigPush();
-
     CC3000_ASSERT_CS;
 
     // Wait for TX/RX Compete which will come as DMA interrupt
@@ -695,7 +719,6 @@ void SPI_IRQ(void)
     SpiWriteDataSynchronous(sSpiInformation.pTxPacket, sSpiInformation.usTxPacketLength);
     sSpiInformation.ulSpiState = eSPI_STATE_IDLE;
     CC3000_DEASSERT_CS;
-    SpiConfigPop();
   }
 
   DEBUGPRINT_F("\tCC3000: Leaving SPI_IRQ\n\r");
