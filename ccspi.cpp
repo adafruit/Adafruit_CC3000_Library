@@ -566,7 +566,7 @@ long ReadWlanInterruptPin(void)
 void WlanInterruptEnable()
 {
   DEBUGPRINT_F("\tCC3000: WlanInterruptEnable.\n\r");
-  delay(100);
+  // delay(100);
   attachInterrupt(g_IRQnum, SPI_IRQ, FALLING);
 }
 
