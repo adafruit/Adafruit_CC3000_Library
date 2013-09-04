@@ -44,6 +44,15 @@ int getFreeRam(void)
   return free_memory;
 } 
 
+void displayFreeRam(void)
+{
+  if (CC3KPrinter == 0) {
+    return;
+  }
+  CC3KPrinter->print(F("Free RAM: "));
+  CC3KPrinter->print(getFreeRam());
+  CC3KPrinter->println(F(" bytes"));
+}
 
 void uart_putchar(char c) {
   if (CC3KPrinter != 0) {
