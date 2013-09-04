@@ -63,12 +63,12 @@ char    monthDays[12] = { 31,  28,  31,  30,  31,  30,  31,  31,  30,  31,  30, 
 		char* pAscii = ascii;
 	
 	delay(10);
-		Serial.print(F("Block: (addr ")); Serial.print((uint16_t)buf, HEX); Serial.print(F(", length ")); Serial.print(len, HEX);
+		if (CC3KPrinter != 0) { CC3KPrinter->print(F("Block: (addr ")); CC3KPrinter->print((uint16_t)buf, HEX); CC3KPrinter->print(F(", length ")); CC3KPrinter->print(len, HEX); }
 	//	traceFn("Block: (addr %p, length 0x%04x)", buf, len);
 
 		while (count < len)
 		{
-			Serial.println(); Serial.print((uint16_t)offset,HEX); Serial.print(F(": "));
+			if (CC3KPrinter != 0) { CC3KPrinter->println(); CC3KPrinter->print((uint16_t)offset,HEX); CC3KPrinter->print(F(": ")); }
 	//		traceFn("\r\n  %p: ", offset);
 			lineCount = 0;
 			pAscii = (char*)&ascii;
@@ -76,21 +76,21 @@ char    monthDays[12] = { 31,  28,  31,  30,  31,  30,  31,  31,  30,  31,  30, 
 			while ((count < len) && (lineCount < 8))
 			{
 				if ((*offset <= ' ') || (*offset == 0xFF)) *pAscii++ = '.'; else *pAscii++ = *offset; *pAscii++ = ' ';
-				Serial.print((*offset)>>4,HEX); Serial.print((*offset++)&0x0F,HEX); Serial.print(F(" "));
+				if (CC3KPrinter != 0) { CC3KPrinter->print((*offset)>>4,HEX); CC3KPrinter->print((*offset++)&0x0F,HEX); CC3KPrinter->print(F(" ")); }
 	//			traceFn("0x%02bx ", *offset++);
 				count++;
 				lineCount++;
 			}
 			while (lineCount++ < 8)
 			{
-				Serial.print(F("     "));
+				if (CC3KPrinter != 0) { CC3KPrinter->print(F("     ")); }
 	//			traceFn("     ");
 			}
-			Serial.print(F("  | ")); Serial.print(ascii); Serial.print(F("|"));
+			if (CC3KPrinter != 0) { CC3KPrinter->print(F("  | ")); CC3KPrinter->print(ascii); CC3KPrinter->print(F("|")); }
 	// 		traceFn("  | %s|", ascii);
 	delay(10);
 		}
-		Serial.println();
+		if (CC3KPrinter != 0) { CC3KPrinter->println(); }
 	//	traceFn("\r\n");
 	}
 #endif
@@ -145,7 +145,7 @@ int sntp::GetSystemClockAsNTPTime(SNTP_Timestamp_t* ntpSystemTime)
 	}
 
 	#ifdef CLOCK_DEBUG
-		Serial.print(F(" GetSystemClockAsNTPTime: "));Serial.print(ntpSystemTime->seconds,HEX);Serial.print(F("."));Serial.println(ntpSystemTime->fraction,HEX);
+		if (CC3KPrinter != 0) { CC3KPrinter->print(F(" GetSystemClockAsNTPTime: ")); CC3KPrinter->print(ntpSystemTime->seconds,HEX); CC3KPrinter->print(F(".")); CC3KPrinter->println(ntpSystemTime->fraction,HEX); }
 	#endif
 	return 0;
 }
@@ -162,20 +162,20 @@ SNTP_Timestamp_t* sntp::NTPGetTime(SNTP_Timestamp_t* ntpTime, bool local)
 		*ntpTime = m_NTPReferenceTime;
 		
 		#ifdef CLOCK_DEBUG
-			Serial.print(F(" NTPGetTime m_NTPReferenceTime: "));Serial.print(ntpTime->seconds,HEX);Serial.print(F("."));Serial.println(ntpTime->fraction,HEX);
+			if (CC3KPrinter != 0) { CC3KPrinter->print(F(" NTPGetTime m_NTPReferenceTime: ")); CC3KPrinter->print(ntpTime->seconds,HEX); CC3KPrinter->print(F(".")); CC3KPrinter->println(ntpTime->fraction,HEX); }
 		#endif
 		
 		AddNTPtime(&ntpSystemTime, ntpTime);
 
 		#ifdef CLOCK_DEBUG
-			Serial.print(F(" NTPGetTime NTP Current UTC: "));Serial.print(ntpTime->seconds,HEX);Serial.print(F("."));Serial.println(ntpTime->fraction,HEX);
+			if (CC3KPrinter != 0) { CC3KPrinter->print(F(" NTPGetTime NTP Current UTC: ")); CC3KPrinter->print(ntpTime->seconds,HEX); CC3KPrinter->print(F(".")); CC3KPrinter->println(ntpTime->fraction,HEX); }
 		#endif
 
 		if (local)                                         //if true, add in local offset from UTC
 		{
 			AddNTPtime(m_cur_UTC_offset, ntpTime);
 			#ifdef CLOCK_DEBUG
-				Serial.print(F(" NTPGetTime NTP Current Local: "));Serial.print(ntpTime->seconds,HEX);Serial.print(F("."));Serial.println(ntpTime->fraction,HEX);
+				if (CC3KPrinter != 0) { CC3KPrinter->print(F(" NTPGetTime NTP Current Local: ")); CC3KPrinter->print(ntpTime->seconds,HEX); CC3KPrinter->print(F(".")); CC3KPrinter->println(ntpTime->fraction,HEX); }
 			#endif
 		}
 	}
@@ -219,7 +219,7 @@ NetTime_t *sntp::ExtractNTPTime(/*in*/ SNTP_Timestamp_t *ntpTime, /*out*/ NetTim
 	dayno = time / SECS_DAY;                  //days since 1/1/1900 (or since 2/7/2036)
 
 	#ifdef CLOCK_DEEP_DEBUG
-		Serial.print(F("dayclock = "));Serial.print(dayclock);Serial.print(F("dayno = "));Serial.println(dayno);
+		if (CC3KPrinter != 0) { CC3KPrinter->print(F("dayclock = ")); CC3KPrinter->print(dayclock); CC3KPrinter->print(F("dayno = ")); CC3KPrinter->println(dayno); }
 	#endif
 
 	if (dateOverflow)                       //if the date overflowed, we'll effectively add the overflowed bit
@@ -230,7 +230,7 @@ NetTime_t *sntp::ExtractNTPTime(/*in*/ SNTP_Timestamp_t *ntpTime, /*out*/ NetTim
 		dayclock %= SECS_DAY;                 // get rid of any overflow (we already added it to dayno in previous line)
 
 		#ifdef CLOCK_DEEP_DEBUG
-			Serial.print(F("    date overflow: dayclock ="));Serial.print(dayclock);Serial.print(F("dayno = "));Serial.println(dayno);
+			if (CC3KPrinter != 0) { CC3KPrinter->print(F("    date overflow: dayclock =")); CC3KPrinter->print(dayclock); CC3KPrinter->print(F("dayno = ")); CC3KPrinter->println(dayno); }
 		#endif
 
 	}
@@ -248,7 +248,7 @@ NetTime_t *sntp::ExtractNTPTime(/*in*/ SNTP_Timestamp_t *ntpTime, /*out*/ NetTim
 	year = (dayno / FIX_PT_DAYS_YEAR) + BASE_YEAR;  // (365.25 * 256)instead of doing a floating-point divide by 365.25
 
 	#ifdef CLOCK_DEEP_DEBUG
-		Serial.print(year);Serial.print(F("  = ("));Serial.print(dayno);Serial.print(F(" // "));Serial.print(FIX_PT_DAYS_YEAR);Serial.print(F(") + "));Serial.println(BASE_YEAR);
+		if (CC3KPrinter != 0) { CC3KPrinter->print(year); CC3KPrinter->print(F("  = (")); CC3KPrinter->print(dayno); CC3KPrinter->print(F(" // ")); CC3KPrinter->print(FIX_PT_DAYS_YEAR); CC3KPrinter->print(F(") + ")); CC3KPrinter->println(BASE_YEAR); }
 	#endif
 
 	extractedTime->year = year;
@@ -365,13 +365,13 @@ char sntp::GetNTPServerList(const char** ntp_pool_list, uint32_t* addrBuffer, in
 		while ((*ntpPoolName) && (!ntpServer))
 		{
 			#ifdef CLOCK_DEBUG
-				Serial.print(F("Checking NTP server/pool address ")); Serial.println(*ntpPoolName);
+				if (CC3KPrinter != 0) { CC3KPrinter->print(F("Checking NTP server/pool address ")); CC3KPrinter->println(*ntpPoolName); }
 			#endif
 
 			gethostbyname(*ntpPoolName, strlen(*ntpPoolName), &ntpServer);
 
 			#ifdef CLOCK_DEBUG
-				Serial.print(F("     returns ntpServer: ")); Serial.println(ntpServer,HEX);
+				if (CC3KPrinter != 0) { CC3KPrinter->print(F("     returns ntpServer: ")); CC3KPrinter->println(ntpServer,HEX); }
 			#endif
 
 			ntpPoolName++;
@@ -399,7 +399,7 @@ bool  sntp::SNTP_GetTime(int	sntpSocket, uint32_t *ntpServerAddr)
 	SNTP_Message_t		sntp_message;			 // sntp message buffer
 
 	#ifdef CLOCK_DEBUG
-		Serial.println(F("SNTP_GetTime"));
+		if (CC3KPrinter != 0) { CC3KPrinter->println(F("SNTP_GetTime")); }
 	#endif
 	
 	// set the ntp server address and port
@@ -415,7 +415,7 @@ bool  sntp::SNTP_GetTime(int	sntpSocket, uint32_t *ntpServerAddr)
 	NTPGetTime(&sntp_message.tsTransmit, false);             //transmitting at current UTC time
 
 	#ifdef CLOCK_DEBUG
-		Serial.print(F("SNTP sendto server ")); Serial.println(socketAddr.sin_addr.s_addr,HEX);
+		if (CC3KPrinter != 0) { CC3KPrinter->print(F("SNTP sendto server ")); CC3KPrinter->println(socketAddr.sin_addr.s_addr,HEX); }
 		dumpBlock1((char*)&sntp_message, sizeof(SNTP_Message_t));
 	#endif
 
@@ -423,13 +423,13 @@ bool  sntp::SNTP_GetTime(int	sntpSocket, uint32_t *ntpServerAddr)
 	byteCount = sendto(sntpSocket, &sntp_message, sizeof(SNTP_Message_t), 0, (sockaddr*)&socketAddr, sockLen);
 
 	#ifdef CLOCK_DEBUG
-		Serial.print(F("sendto transmitted "));Serial.print(byteCount,HEX);Serial.println(F(" bytes"));
+		if (CC3KPrinter != 0) { CC3KPrinter->print(F("sendto transmitted ")); CC3KPrinter->print(byteCount,HEX); CC3KPrinter->println(F(" bytes")); }
 	#endif
 		
 	if (sizeof(SNTP_Message_t) == byteCount)
 	{
 		#ifdef CLOCK_DEBUG
-			Serial.println(F("Waiting for response"));
+			if (CC3KPrinter != 0) { CC3KPrinter->println(F("Waiting for response")); }
 		#endif
 
 		setsockopt(sntpSocket, SOL_SOCKET, SOCKOPT_RECV_TIMEOUT, &recvTimeout, (socklen_t)sizeof(recvTimeout));
@@ -440,7 +440,7 @@ bool  sntp::SNTP_GetTime(int	sntpSocket, uint32_t *ntpServerAddr)
 		NTPGetTime(&tsDestination, false);
 			
 		#ifdef CLOCK_DEBUG
-			Serial.print(F("SNTP received "));Serial.print(byteCount);Serial.println(F(" bytes"));
+			if (CC3KPrinter != 0) { CC3KPrinter->print(F("SNTP received ")); CC3KPrinter->print(byteCount); CC3KPrinter->println(F(" bytes")); }
 		#endif
 			
 		//If we got a good response packet, go ahead and calculate the current time.
@@ -460,7 +460,7 @@ bool  sntp::SNTP_GetTime(int	sntpSocket, uint32_t *ntpServerAddr)
 				
 			#ifdef CLOCK_DEBUG
 				dumpBlock1((char*)&sntp_message, sizeof(SNTP_Message_t));
-				Serial.println(F("Received at "));
+				if (CC3KPrinter != 0) { CC3KPrinter->println(F("Received at ")); }
 				dumpBlock1((char*)&tsDestination, sizeof(tsDestination));
 			#endif
 			
@@ -469,28 +469,28 @@ bool  sntp::SNTP_GetTime(int	sntpSocket, uint32_t *ntpServerAddr)
 			//Server received request at tsReceive, we sent request at tsOriginate
 			DiffNTPtime(&sntp_message.tsOriginate, &sntp_message.tsReceive);
 			#ifdef CLOCK_DEBUG
-				Serial.print(F(" (R - O): "));Serial.print(sntp_message.tsReceive.seconds,HEX);Serial.print(F("."));Serial.println(sntp_message.tsReceive.fraction,HEX);
+				if (CC3KPrinter != 0) { CC3KPrinter->print(F(" (R - O): ")); CC3KPrinter->print(sntp_message.tsReceive.seconds,HEX); CC3KPrinter->print(F(".")); CC3KPrinter->println(sntp_message.tsReceive.fraction,HEX); }
 			#endif
 			NTPdiv2(&sntp_message.tsReceive);
 			#ifdef CLOCK_DEBUG
-				Serial.print(F(" (R - O)/2: "));Serial.print(sntp_message.tsReceive.seconds,HEX);Serial.print(F("."));Serial.println(sntp_message.tsReceive.fraction,HEX);
+				if (CC3KPrinter != 0) { CC3KPrinter->print(F(" (R - O)/2: ")); CC3KPrinter->print(sntp_message.tsReceive.seconds,HEX); CC3KPrinter->print(F(".")); CC3KPrinter->println(sntp_message.tsReceive.fraction,HEX); }
 			#endif
 
 			//Server sent reply at tsTransmit, we received reply at tsDestination
 			DiffNTPtime(&tsDestination, &sntp_message.tsTransmit);
 			#ifdef CLOCK_DEBUG
-				Serial.print(F(" (T - D): "));Serial.print(sntp_message.tsTransmit.seconds,HEX);Serial.print(F("."));Serial.println(sntp_message.tsTransmit.fraction,HEX);
+				if (CC3KPrinter != 0) { CC3KPrinter->print(F(" (T - D): ")); CC3KPrinter->print(sntp_message.tsTransmit.seconds,HEX); CC3KPrinter->print(F(".")); CC3KPrinter->println(sntp_message.tsTransmit.fraction,HEX); }
 			#endif
 			NTPdiv2(&sntp_message.tsTransmit);
 			#ifdef CLOCK_DEBUG
-				Serial.print(F(" (T - D)/2: "));Serial.print(sntp_message.tsTransmit.seconds,HEX);Serial.print(F("."));Serial.println(sntp_message.tsTransmit.fraction,HEX);
+				if (CC3KPrinter != 0) { CC3KPrinter->print(F(" (T - D)/2: ")); CC3KPrinter->print(sntp_message.tsTransmit.seconds,HEX); CC3KPrinter->print(F(".")); CC3KPrinter->println(sntp_message.tsTransmit.fraction,HEX); }
 			#endif
 
 			//Correction is returned in tsTransmit
 			AddNTPtime(&sntp_message.tsReceive, &sntp_message.tsTransmit);
 
 			#ifdef CLOCK_DEBUG
-				Serial.print(F(" Offset: "));Serial.print(sntp_message.tsTransmit.seconds,HEX);Serial.print(F("."));Serial.println(sntp_message.tsTransmit.fraction,HEX);
+				if (CC3KPrinter != 0) { CC3KPrinter->print(F(" Offset: ")); CC3KPrinter->print(sntp_message.tsTransmit.seconds,HEX); CC3KPrinter->print(F(".")); CC3KPrinter->println(sntp_message.tsTransmit.fraction,HEX); }
 			#endif
 			
 			//Add correction to current ntp reference time
@@ -499,7 +499,7 @@ bool  sntp::SNTP_GetTime(int	sntpSocket, uint32_t *ntpServerAddr)
 	
 			#ifdef CLOCK_DEBUG
 				NTPGetTime(&tsDestination, false);        //we'll display local time
-				Serial.print(F(" time is "));Serial.print(tsDestination.seconds,HEX);Serial.print(F("."));Serial.println(tsDestination.fraction,HEX);
+				if (CC3KPrinter != 0) { CC3KPrinter->print(F(" time is ")); CC3KPrinter->print(tsDestination.seconds,HEX); CC3KPrinter->print(F(".")); CC3KPrinter->println(tsDestination.fraction,HEX); }
 			#endif
 
 			result = true;
@@ -522,7 +522,7 @@ bool sntp::UpdateNTPTime()
 	bool				checkGlobal;           // true if we haven't searched the global NTP server list.
 
 	#ifdef CLOCK_DEBUG
-		Serial.println(F("sntp.update"));
+		if (CC3KPrinter != 0) { CC3KPrinter->println(F("sntp.update")); }
 	#endif
 	
 	sntpSocket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
@@ -539,14 +539,14 @@ bool sntp::UpdateNTPTime()
 			// bind the socket to the local port
 			portIsBound = (0 == bind(sntpSocket, (sockaddr*)&socketAddr, sizeof(sockaddr_in)));
 			#ifdef CLOCK_DEBUG
-				Serial.print(F("local: "));Serial.print(socketAddr.sin_addr.s_addr, HEX);Serial.print(F(": "));Serial.println(socketAddr.sin_port, HEX);
+				if (CC3KPrinter != 0) { CC3KPrinter->print(F("local: ")); CC3KPrinter->print(socketAddr.sin_addr.s_addr, HEX); CC3KPrinter->print(F(": ")); CC3KPrinter->println(socketAddr.sin_port, HEX); }
 			#endif
 		}
 
 		if (portIsBound)
 		{
 			#ifdef CLOCK_DEBUG
-				Serial.print(F("Init SNTP bind socket "));Serial.print(sntpSocket);Serial.print(F("to port "));Serial.print(socketAddr.sin_port);Serial.println(F(" succeeded"));
+				if (CC3KPrinter != 0) { CC3KPrinter->print(F("Init SNTP bind socket ")); CC3KPrinter->print(sntpSocket); CC3KPrinter->print(F("to port ")); CC3KPrinter->print(socketAddr.sin_port); CC3KPrinter->println(F(" succeeded")); }
 			#endif
 
 			m_change_DST = 0;
@@ -559,7 +559,7 @@ bool sntp::UpdateNTPTime()
 				checkLocal = (NULL !=  m_localPool);   	// if that craps out, we'll try the local server-pool list
 				checkGlobal = (NULL != m_globalPool);		//if that craps out, we'll try the global server-pool list
 				#ifdef CLOCK_DEBUG
-					Serial.print(F("try user's ntp server list: ")); Serial.println((uint32_t)*ntp_pool_list);
+					if (CC3KPrinter != 0) { CC3KPrinter->print(F("try user's ntp server list: ")); CC3KPrinter->println((uint32_t)*ntp_pool_list); }
 				#endif
 
 				memset(&ntp_server_list, 0, sizeof(NTP_Server_List_t));
@@ -589,7 +589,7 @@ bool sntp::UpdateNTPTime()
 							ntp_pool_list = m_localPool;    //try local ntp server pool list ('local' means 'regional', e.g., US, North America, etc)
 							checkLocal = false;
 							#ifdef CLOCK_DEBUG
-								Serial.print(F("try local ntp_pool_list: ")); Serial.println((uint32_t)*ntp_pool_list);
+								if (CC3KPrinter != 0) { CC3KPrinter->print(F("try local ntp_pool_list: ")); CC3KPrinter->println((uint32_t)*ntp_pool_list); }
 							#endif
 						}
 						else
@@ -599,7 +599,7 @@ bool sntp::UpdateNTPTime()
 								ntp_pool_list = m_globalPool;   //now try global (i.e., default) ntp server pool list
 								checkGlobal = false;
 								#ifdef CLOCK_DEBUG
-								Serial.print(F("try global ntp_pool_list: ")); Serial.println((uint32_t)*ntp_pool_list);
+								if (CC3KPrinter != 0) { CC3KPrinter->print(F("try global ntp_pool_list: ")); CC3KPrinter->println((uint32_t)*ntp_pool_list); }
 								#endif
 							}
 							else
@@ -638,19 +638,22 @@ bool sntp::UpdateNTPTime()
 		} //if (portIsBound)
 		else //socket bind failed
 		{
-			Serial.print(F("Init SNTP bind socket "));Serial.print(sntpSocket);Serial.print(F("to port "));Serial.print(SNTP_PORT);Serial.println(F("failed"));
+			if (CC3KPrinter != 0) { CC3KPrinter->print(F("Init SNTP bind socket ")); CC3KPrinter->print(sntpSocket); CC3KPrinter->print(F("to port ")); CC3KPrinter->print(SNTP_PORT); CC3KPrinter->println(F("failed")); }
 			closesocket(sntpSocket);
 			sntpSocket = -1;
 		}
 	} //if (sntpSocket >= 0)
 	else    // didn't get a socket
 	{
-		Serial.println(F("Failed to get a socket"));
+		if (CC3KPrinter != 0) { CC3KPrinter->println(F("Failed to get a socket")); }
 	}
 	#ifdef CLOCK_DEBUG
-		Serial.println(F("exit sntp.update"));
-		Serial.print(F("m_std_UTC_offset.seconds: "));Serial.println(m_std_UTC_offset.seconds, HEX);
-		Serial.print(F("m_dst_UTC_offset.seconds: "));Serial.println(m_dst_UTC_offset.seconds, HEX);
+		if (CC3KPrinter != 0)
+		{
+			CC3KPrinter->println(F("exit sntp.update"));
+			CC3KPrinter->print(F("m_std_UTC_offset.seconds: ")); CC3KPrinter->println(m_std_UTC_offset.seconds, HEX);
+			CC3KPrinter->print(F("m_dst_UTC_offset.seconds: ")); CC3KPrinter->println(m_dst_UTC_offset.seconds, HEX);
+		}
 	#endif
 	return m_timeIsSet;
 }

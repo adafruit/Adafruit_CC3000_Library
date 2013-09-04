@@ -403,6 +403,7 @@ class sntp
 };
 
 //extern sntp SNTP;
+extern Print* CC3KPrinter;
 
 #endif
 
