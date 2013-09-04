@@ -359,9 +359,7 @@ void SpiWriteDataSynchronous(unsigned char *data, unsigned short size)
   uint8_t loc;
   for (loc = 0; loc < size; loc ++) 
   {
-    SPDR = data[loc];               /* Start the transmission           */
-    while (!(SPSR & (1<<SPIF)));    /* Wait the end of the transmission */
-    dummy = SPDR;
+    dummy = SPI.transfer(data[loc]);
 #if (DEBUG_MODE == 1)
       if (!(loc==size-1))
       {
