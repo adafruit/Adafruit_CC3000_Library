@@ -19,7 +19,8 @@ This example does a test of the SNTP (Simple Network Time Protocol) client:
 * SSID Scan
 * AP connection
 * DHCP printout
-* SNTP time synchronization	
+* SNTP time synchronization
+* Extract and print current time and date information
  
 */
 
@@ -41,7 +42,7 @@ This example does a test of the SNTP (Simple Network Time Protocol) client:
 Adafruit_CC3000 cc3000 = Adafruit_CC3000(ADAFRUIT_CC3000_CS, ADAFRUIT_CC3000_IRQ, ADAFRUIT_CC3000_VBAT,
                                          SPI_CLOCK_DIV2); // you can change this clock speed but DI
 
-#define WLAN_SSID       "myNetwork"        // cannot be longer than 32 characters!
+#define WLAN_SSID       "myNetwork"   // cannot be longer than 32 characters!
 #define WLAN_PASS       "myPassword"
 // Security can be WLAN_SEC_UNSEC, WLAN_SEC_WEP, WLAN_SEC_WPA or WLAN_SEC_WPA2
 #define WLAN_SECURITY   WLAN_SEC_WPA2
@@ -170,7 +171,7 @@ void setup(void)
 
   Serial.print(timeExtract.hour); Serial.print(F(":")); Serial.print(timeExtract.min); Serial.print(F(":"));Serial.print(timeExtract.sec); Serial.print(F("."));Serial.println(timeExtract.millis);
   Serial.print(pF(&dayStrs[timeExtract.wday])); Serial.print(F(", ")); Serial.print(pF(&monthStrs[timeExtract.mon])); Serial.print(F(" ")); Serial.print(timeExtract.mday); Serial.print(F(", "));Serial.println(timeExtract.year);
-  Serial.print(F("Day of year: ")); Serial.println(timeExtract.yday); 
+  Serial.print(F("Day of year: ")); Serial.println(timeExtract.yday + 1); 
 
   /* You need to make sure to clean up after yourself or the CC3000 can freak out */
   /* the next time you try to connect ... */
