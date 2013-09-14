@@ -352,7 +352,7 @@ typedef struct NetTime_t
 	uint8_t	 mon;    ///< Months since January (0..11)
 	uint16_t year;   ///< Year.
 	uint8_t	 wday;	 ///< Days since Sunday (0..6)
-	uint8_t	 yday;   ///< Days since January 1 (0..365)
+	uint16_t yday;   ///< Days since January 1 (0..365)
 	bool	 isdst;  ///< Daylight savings time flag, currently not supported
 };
 
