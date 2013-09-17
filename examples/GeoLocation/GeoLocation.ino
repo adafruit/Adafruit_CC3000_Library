@@ -126,7 +126,7 @@ void setup(void) {
   client = cc3000.connectTCP(ip, 80);
   if(client.connected()) {
     Serial.print(F("connected.\r\nRequesting data..."));
-    client.print(F("GET /json HTTP/1.0\r\nConnection: close\r\n\r\n"));
+    client.print(F("GET /json/ HTTP/1.0\r\nConnection: close\r\n\r\n"));
   } else {
     Serial.println(F("failed"));
     return;
