@@ -17,6 +17,9 @@
 */
 /**************************************************************************/
 
+#ifndef ADAFRUIT_CC3000_H
+#define ADAFRUIT_CC3000_H
+
 #if ARDUINO >= 100
  #include "Arduino.h"
 #else
@@ -143,3 +146,5 @@ class Adafruit_CC3000 {
 };
 
 extern Print* CC3KPrinter;
+
+#endif
