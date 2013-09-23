@@ -167,8 +167,11 @@ extern "C" {
 //*****************************************************************************
 //                  Compound Types
 //*****************************************************************************
-// typedef long time_t;
+#ifdef __AVR__
 typedef unsigned long time_t;  /* KTown: Updated to be compatible with Arduino Time.h */
+#else
+typedef long time_t;
+#endif
 typedef unsigned long clock_t;
 typedef long suseconds_t;
 
