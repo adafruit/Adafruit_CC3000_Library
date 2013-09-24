@@ -236,8 +236,12 @@ int init_spi(void)
   pinMode(g_csPin, OUTPUT);
 
   /* Set interrupt/gpio pin to input */
+#if defined(INPUT_PULLUP)
+  pinMode(g_irqPin, INPUT_PULLUP);
+#else
   pinMode(g_irqPin, INPUT);
   digitalWrite(g_irqPin, HIGH); // w/weak pullup
+#endif
 
   SpiConfigStoreOld(); // prime ccspi_old* values for DEASSERT
 
