@@ -47,7 +47,7 @@ static const uint8_t dreqinttable[] = {
   20, 3,
   19, 4,
   18, 5,
-#elif  defined(__AVR_ATmega32u4__) && defined(CORE_TEENSY)
+#elif  defined(__AVR_ATmega32U4__) && defined(CORE_TEENSY)
   5, 0,
   6, 1,
   7, 2,
@@ -69,7 +69,7 @@ static const uint8_t dreqinttable[] = {
   20, 20, 21, 21, 22, 22, 23, 23, 24, 24,
   25, 25, 26, 26, 27, 27, 28, 28, 29, 29,
   30, 30, 31, 31, 32, 32, 33, 33,
-#elif  defined(__AVR_ATmega32u4__) 
+#elif  defined(__AVR_ATmega32U4__) 
   7, 4,
   3, 0,
   2, 1,
