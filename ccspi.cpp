@@ -74,7 +74,7 @@ this is so that we can have multiple SPI devices
 on the same bus, so they can operate at different speeds
 and in different modes
 */
-#if defined(SPI2X) // most likely AVR8
+#if defined(SPI2X) && defined(__AVR__) // most likely AVR8
 uint8_t ccspi_mySPCR, ccspi_mySPSR, ccspi_oldSPSR, ccspi_oldSPCR;
 #define SpiConfigStoreOld() {             \
   ccspi_oldSPCR = SPCR;                   \
