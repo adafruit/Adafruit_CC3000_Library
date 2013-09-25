@@ -74,7 +74,7 @@ this is so that we can have multiple SPI devices
 on the same bus, so they can operate at different speeds
 and in different modes
 */
-#if defined(SPI2X) // most likely AVR8
+#if defined(SPI2X) && defined(__AVR__) // most likely AVR8
 uint8_t ccspi_mySPCR, ccspi_mySPSR, ccspi_oldSPSR, ccspi_oldSPCR;
 #define SpiConfigStoreOld() {             \
   ccspi_oldSPCR = SPCR;                   \
@@ -236,8 +236,12 @@ int init_spi(void)
   pinMode(g_csPin, OUTPUT);
 
   /* Set interrupt/gpio pin to input */
+#if defined(INPUT_PULLUP)
+  pinMode(g_irqPin, INPUT_PULLUP);
+#else
   pinMode(g_irqPin, INPUT);
   digitalWrite(g_irqPin, HIGH); // w/weak pullup
+#endif
 
   SpiConfigStoreOld(); // prime ccspi_old* values for DEASSERT
 
