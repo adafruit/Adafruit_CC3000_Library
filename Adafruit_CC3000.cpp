@@ -182,7 +182,7 @@ Adafruit_CC3000::Adafruit_CC3000(uint8_t csPin, uint8_t irqPin, uint8_t vbatPin,
   ulSocket              = 0;
   ulSmartConfigFinished = 0;
 
-  #if defined(UDR0) || defined(UDR1)
+  #if defined(UDR0) || defined(UDR1) || defined(CORE_TEENSY)
   CC3KPrinter = &Serial;
   #else
   CC3KPrinter = 0;
