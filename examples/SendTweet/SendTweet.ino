@@ -131,7 +131,10 @@ void setup(void) {
   Serial.print(F("Hello! Initializing CC3000..."));
   if(!cc3000.begin()) hang(F("failed. Check your wiring?"));
 
-  if(checkFirmwareVersion() != 0x113) hang(F("wrong firmware version."));
+  uint16_t firmware = checkFirmwareVersion();
+  if ((firmware != 0x113) && (firmware != 0x118)) {
+    hang(F("Wrong firmware version!"));
+  }
 
   Serial.print(F("OK\r\nDeleting old connection profiles..."));
   if(!cc3000.deleteProfiles()) hang(F("failed."));
