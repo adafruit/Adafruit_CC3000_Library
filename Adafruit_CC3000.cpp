@@ -611,9 +611,7 @@ status_t Adafruit_CC3000::getStatus()
 ResultStruct_t SSIDScanResultBuff;
 
 
-uint16_t Adafruit_CC3000::startSSIDscan() {
-  uint16_t   index = 0;
-
+bool Adafruit_CC3000::startSSIDscan(uint32_t *index) {
   if (!_initialised)
   {
     return false;
@@ -632,8 +630,8 @@ uint16_t Adafruit_CC3000::startSSIDscan() {
   CHECK_SUCCESS(wlan_ioctl_get_scan_results(0, (uint8_t* ) &SSIDScanResultBuff),
                 "SSID scan failed!", false);
 
-  index = SSIDScanResultBuff.num_networks;
-  return index;
+  *index = SSIDScanResultBuff.num_networks;
+  return true;
 }
 
 void Adafruit_CC3000::stopSSIDscan(void) {

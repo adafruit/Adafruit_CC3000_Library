@@ -119,7 +119,7 @@ class Adafruit_CC3000 {
     #ifndef CC3000_TINY_DRIVER
     bool     getFirmwareVersion(uint8_t *major, uint8_t *minor);
     status_t getStatus(void);
-    uint16_t startSSIDscan(void);
+    bool     startSSIDscan(uint32_t *index);
     void     stopSSIDscan();
     uint8_t  getNextSSID(uint8_t *rssi, uint8_t *secMode, char *ssidname);
 
