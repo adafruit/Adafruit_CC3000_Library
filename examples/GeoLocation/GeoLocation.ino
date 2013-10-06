@@ -93,7 +93,10 @@ void setup(void) {
   }
 
   Serial.print(F("OK.\r\nConnecting to network..."));
-  cc3000.connectToAP(WLAN_SSID, WLAN_PASS, WLAN_SECURITY);
+  if(!cc3000.connectToAP(WLAN_SSID, WLAN_PASS, WLAN_SECURITY)) {
+    Serial.println(F("Failed!"));
+    return;
+  }
   Serial.println(F("connected!"));
 
   Serial.print(F("Requesting address from DHCP server..."));

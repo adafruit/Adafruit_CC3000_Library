@@ -86,7 +86,10 @@ void setup(void)
   Serial.print(F("\nAttempting to connect to ")); Serial.println(ssid);
   
   /* NOTE: Secure connections are not available in 'Tiny' mode! */
-  cc3000.connectToAP(WLAN_SSID, WLAN_PASS, WLAN_SECURITY);
+  if (!cc3000.connectToAP(WLAN_SSID, WLAN_PASS, WLAN_SECURITY)) {
+    Serial.println(F("Failed!"));
+    while(1);
+  }
    
   Serial.println(F("Connected!"));
   

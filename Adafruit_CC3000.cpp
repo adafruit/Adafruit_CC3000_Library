@@ -203,6 +203,8 @@ Adafruit_CC3000::Adafruit_CC3000(uint8_t csPin, uint8_t irqPin, uint8_t vbatPin,
 /**************************************************************************/
 bool Adafruit_CC3000::begin(uint8_t patchReq)
 {
+  if (_initialised) return true;
+
   #ifndef CORE_ADAX
   // determine irq #
   for (uint8_t i=0; i<sizeof(dreqinttable); i+=2) {
@@ -509,6 +511,8 @@ bool Adafruit_CC3000::setMacAddress(uint8_t address[6])
 bool Adafruit_CC3000::getIPAddress(uint32_t *retip, uint32_t *netmask, uint32_t *gateway, uint32_t *dhcpserv, uint32_t *dnsserv)
 {
   if (!_initialised) return false;
+  if (!ulCC3000Connected) return false;
+  if (!ulCC3000DHCP) return false;
 
   tNetappIpconfigRetArgs ipconfig;
   netapp_ipconfig(&ipconfig);
@@ -942,7 +946,11 @@ bool Adafruit_CC3000::connectSecure(const char *ssid, const char *key, int32_t s
 #endif
 
 // Connect with timeout
-void Adafruit_CC3000::connectToAP(const char *ssid, const char *key, uint8_t secmode) {
+bool Adafruit_CC3000::connectToAP(const char *ssid, const char *key, uint8_t secmode) {
+  if (!_initialised) {
+    return false;
+  }
+
   int16_t timer = WLAN_CONNECT_TIMEOUT;
 
   do {
@@ -990,15 +998,17 @@ void Adafruit_CC3000::connectToAP(const char *ssid, const char *key, uint8_t sec
       if (CC3KPrinter != 0) CC3KPrinter->println(F("Timed out!"));
     }
   } while (!checkConnected());
+
+  return true;
 }
 
 
 #ifndef CC3000_TINY_DRIVER
 uint16_t Adafruit_CC3000::ping(uint32_t ip, uint8_t attempts, uint16_t timeout, uint8_t size) {
-  if (!_initialised)
-  {
-    return 0;
-  }
+  if (!_initialised) return 0;
+  if (!ulCC3000Connected) return 0;
+  if (!ulCC3000DHCP) return 0;
+
   uint32_t revIP = (ip >> 24) | (ip >> 8) & 0xFF00 | (ip << 8) & 0xFF0000 | (ip << 24);
 
   pingReportnum = 0;
@@ -1036,6 +1046,8 @@ uint16_t Adafruit_CC3000::ping(uint32_t ip, uint8_t attempts, uint16_t timeout, 
 #ifndef CC3000_TINY_DRIVER
 uint16_t Adafruit_CC3000::getHostByName(char *hostname, uint32_t *ip) {
   if (!_initialised) return 0;
+  if (!ulCC3000Connected) return 0;
+  if (!ulCC3000DHCP) return 0;
 
   int16_t r = gethostbyname(hostname, strlen(hostname), ip);
   //if (CC3KPrinter != 0) { CC3KPrinter->print("Errno: "); CC3KPrinter->println(r); }
