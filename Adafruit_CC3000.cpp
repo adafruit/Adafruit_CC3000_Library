@@ -951,7 +951,7 @@ bool Adafruit_CC3000::connectToAP(const char *ssid, const char *key, uint8_t sec
     return false;
   }
 
-  int16_t timer = WLAN_CONNECT_TIMEOUT;
+  int16_t timer;
 
   do {
     cc3k_int_poll();
@@ -985,6 +985,8 @@ bool Adafruit_CC3000::connectToAP(const char *ssid, const char *key, uint8_t sec
       }
 #endif
     }
+	  
+    timer = WLAN_CONNECT_TIMEOUT;
 
     /* Wait around a bit for the async connected signal to arrive or timeout */
     if (CC3KPrinter != 0) CC3KPrinter->print(F("Waiting to connect..."));
