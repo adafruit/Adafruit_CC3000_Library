@@ -78,7 +78,10 @@ void setup(void)
   // Optional SSID scan
   // listSSIDResults();
   
-  cc3000.connectToAP(WLAN_SSID, WLAN_PASS, WLAN_SECURITY);
+  if (!cc3000.connectToAP(WLAN_SSID, WLAN_PASS, WLAN_SECURITY)) {
+    Serial.println(F("Failed!"));
+    while(1);
+  }
    
   Serial.println(F("Connected!"));
   

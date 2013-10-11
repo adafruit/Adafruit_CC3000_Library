@@ -104,7 +104,7 @@ class Adafruit_CC3000 {
     bool     getMacAddress(uint8_t address[6]);
     bool     setMacAddress(uint8_t address[6]);
 
-    void     connectToAP(const char *ssid, const char *key, uint8_t secmode);
+    bool     connectToAP(const char *ssid, const char *key, uint8_t secmode);
     bool     connectSecure(const char *ssid, const char *key, int32_t secMode);
     bool     connectOpen(const char *ssid); 
     bool     checkConnected(void);

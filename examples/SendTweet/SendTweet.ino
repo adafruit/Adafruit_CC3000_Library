@@ -141,7 +141,7 @@ void setup(void) {
 
   Serial.print(F("OK\r\nConnecting to network..."));
   /* NOTE: Secure connections are not available in 'Tiny' mode! */
-  cc3000.connectToAP(WLAN_SSID, WLAN_PASS, WLAN_SECURITY);
+  if(!cc3000.connectToAP(WLAN_SSID, WLAN_PASS, WLAN_SECURITY)) hang(F("Failed!"));
 
   Serial.print(F("OK\r\nRequesting address from DHCP server..."));
   for(t=millis(); !cc3000.checkDHCP() && ((millis() - t) < dhcpTimeout); delay(100));
