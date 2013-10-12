@@ -1121,7 +1121,7 @@ bool Adafruit_CC3000::getIPConfig(tNetappIpconfigRetArgs *ipConfig)
 Adafruit_CC3000_Client Adafruit_CC3000::connectTCP(uint32_t destIP, uint16_t destPort)
 {
   sockaddr      socketAddress;
-  uint32_t      tcp_socket;
+  int32_t       tcp_socket;
 
   // Create the socket(s)
   //if (CC3KPrinter != 0) CC3KPrinter->print(F("Creating socket ... "));
@@ -1166,7 +1166,7 @@ Adafruit_CC3000_Client Adafruit_CC3000::connectTCP(uint32_t destIP, uint16_t des
 Adafruit_CC3000_Client Adafruit_CC3000::connectUDP(uint32_t destIP, uint16_t destPort)
 {
   sockaddr      socketAddress;
-  uint32_t      udp_socket;
+  int32_t       udp_socket;
 
   // Create the socket(s)
   // socket   = SOCK_STREAM, SOCK_DGRAM, or SOCK_RAW 
