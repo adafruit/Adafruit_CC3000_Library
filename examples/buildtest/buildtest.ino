@@ -126,16 +126,18 @@ void setup(void)
     delay(1000);
   }
   
-#ifndef CC3000_TINY_DRIVER    
+#ifndef CC3000_TINY_DRIVER
   /* Try looking up www.adafruit.com */
-  uint32_t ip;
+  uint32_t ip = 0;
   Serial.print(F("www.adafruit.com -> "));
-  if (! cc3000.getHostByName("www.adafruit.com", &ip)) {
-    Serial.println(F("Could not resolve!"));
-  } else {
-    cc3000.printIPdotsRev(ip);
-  }
-
+  while  (ip  ==  0)  {
+    if  (!  cc3000.getHostByName("www.adafruit.com", &ip))  {
+      Serial.println(F("Couldn't resolve!"));
+    }
+    delay(500);
+  }  
+  cc3000.printIPdotsRev(ip);
+  
   /* Do a quick ping test on adafruit.com */  
   Serial.print(F("\n\rPinging ")); cc3000.printIPdotsRev(ip); Serial.print("...");  
   uint8_t replies = cc3000.ping(ip, 5);
