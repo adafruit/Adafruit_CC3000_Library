@@ -1,6 +1,6 @@
 /*************************************************** 
   This is an example for the Adafruit CC3000 Wifi Breakout & Shield
-
+  
   Designed specifically to work with the Adafruit WiFi products:
   ----> https://www.adafruit.com/products/1469
 
@@ -12,21 +12,33 @@
   BSD license, all text above must be included in any redistribution
  ****************************************************/
  
- /*
-This example does a test of the SmartConfig capability:
-  * Initialization
-  * Wait for SmartConfig app to send us the connection details
-  * AP connection
-  * DHCP printout
-  * DNS lookup
-  * Ping
-  * Disconnect
-SmartConfig is still beta and kind of works but is not fully vetted!
-It might not work on all networks!
+/*  This sketch will attempt to establish an AP connection
+    using the SmartConfig tool, and save the connection
+    details for later use (with SmartConfigReconnect, etc.).
+
+    If a connection is successfully established, the data
+    will be stored as a connection profile in non-volatile
+    memory on the CC3000, and the device will be configured
+    to automatically connect to this profile on startup.
+    
+    To see how to safely use the CC3000 without erasing
+    this SmartConfig data please consult the
+    SmartConfigReconnect sketch, which uses an optional flag
+    in Adafruit_CC3000.begin() to avoid erasing the 
+    connection profiles from memory, as well as a new
+    .reconnect function.
+    
+    Using other non SmartConfig example sketches will
+    erase the connection profile data on startup, but
+    this sketch combined with SmartConfigReconnect hopefully
+    illustrate how to use SmartConfig when hard-coded
+    connection details aren't appropriate.
+    
+    SmartConfig is still beta and kind of works but is not fully
+    vetted! It might not work on all networks!    
 */
-
-
- #include <Adafruit_CC3000.h>
+ 
+#include <Adafruit_CC3000.h>
 #include <ccspi.h>
 #include <SPI.h>
 #include <string.h>
@@ -40,10 +52,12 @@ It might not work on all networks!
 
 // Use hardware SPI for the remaining pins
 // On an UNO, SCK = 13, MISO = 12, and MOSI = 11
-Adafruit_CC3000 cc3000 = Adafruit_CC3000(ADAFRUIT_CC3000_CS, ADAFRUIT_CC3000_IRQ, ADAFRUIT_CC3000_VBAT,
+Adafruit_CC3000 cc3000 = Adafruit_CC3000(ADAFRUIT_CC3000_CS, 
+                                         ADAFRUIT_CC3000_IRQ, 
+                                         ADAFRUIT_CC3000_VBAT,
                                          SPI_CLOCK_DIV2);
 
-// We get the SSID & Password via the Smartconfig app!
+// The SSID & Password are retrieved via the Smartconfig app
 
 /**************************************************************************/
 /*!
@@ -54,14 +68,15 @@ Adafruit_CC3000 cc3000 = Adafruit_CC3000(ADAFRUIT_CC3000_CS, ADAFRUIT_CC3000_IRQ
 void setup(void)
 {
   Serial.begin(115200);
-  Serial.println(F("Hello, CC3000!\n")); 
+  Serial.println(F("Hello, CC3000!\n"));
 
   displayDriverMode();
   Serial.print("Free RAM: "); Serial.println(getFreeRam(), DEC);
   
-  /* Initialise the module */
+  /* Initialise the module, deleting any existing profile data (which */
+  /* is the default behaviour)  */
   Serial.println(F("\nInitialising the CC3000 ..."));
-  if (!cc3000.begin())
+  if (!cc3000.begin(false))
   {
     Serial.println(F("Unable to initialise the CC3000! Check your wiring?"));
     while(1);
@@ -74,54 +89,36 @@ void setup(void)
   }
   displayMACAddress();
     
-  /* Delete any old connection data on the module */
-  Serial.println(F("\nDeleting old connection profiles"));
-  if (!cc3000.deleteProfiles())
+  /* Try to use the smart config app (no AES encryption), saving */
+  /* the connection details if we succeed */
+  Serial.println(F("Waiting for a SmartConfig connection (~60s) ..."));
+  if (!cc3000.startSmartConfig(false))
   {
-    Serial.println(F("Failed!"));
-    while(1);
-  }
-
-  /* Try to use the smart config app (no   AES encryption)  */
-  Serial.println(F("Waiting for SmartConfig connection (~60s) ..."));
-  if (!cc3000.startSmartConfig(false))  {
     Serial.println(F("SmartConfig failed"));
     while(1);
   }
   
-  Serial.println(F("Connected!"));
+  Serial.println(F("Saved connection details and connected to AP!"));
   
   /* Wait for DHCP to complete */
   Serial.println(F("Request DHCP"));
-  while (!cc3000.checkDHCP()) {
+  while (!cc3000.checkDHCP()) 
+  {
     delay(100); // ToDo: Insert a DHCP timeout!
-  }  
+  }
 
   /* Display the IP address DNS, Gateway, etc. */  
   while (! displayConnectionDetails()) {
     delay(1000);
   }
   
-#ifndef CC3000_TINY_DRIVER    
-  /* Try looking up www.adafruit.com */
-  uint32_t ip;
-  Serial.print(F("www.adafruit.com -> "));
-  if (! cc3000.getHostByName("www.adafruit.com", &ip)) {
-    Serial.println(F("Could not resolve!"));
-  } else {
-    cc3000.printIPdotsRev(ip);
-  }
-
-  /* Do a quick ping test on adafruit.com */  
-  Serial.print(F("\n\rPinging ")); cc3000.printIPdotsRev(ip); Serial.print("...");  
-  uint8_t replies = cc3000.ping(ip, 5);
-  Serial.print(replies); Serial.println(F(" replies"));
-    
-#endif
-
+  Serial.println(F("\nTo use these connection details be sure to use"));
+  Serial.println(F("'.begin(false, true)' with your Adafruit_CC3000"));
+  Serial.println(F("code instead of the default '.begin()' values!"));
+  
   /* You need to make sure to clean up after yourself or the CC3000 can freak out */
   /* the next time your try to connect ... */
-  Serial.println(F("\n\nClosing the connection"));
+  Serial.println(F("\nClosing the connection"));
   cc3000.disconnect();
 }
 

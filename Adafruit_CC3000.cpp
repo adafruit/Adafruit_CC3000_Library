@@ -199,9 +199,18 @@ Adafruit_CC3000::Adafruit_CC3000(uint8_t csPin, uint8_t irqPin, uint8_t vbatPin,
 /**************************************************************************/
 /*!
     @brief  Setups the HW
+    
+    @args[in] patchReq  
+              Set this to true if we are starting a firmware patch,
+              otherwise false for normal operation
+    @args[in] useSmartConfig
+              Set this to true if you want to use the connection details
+              that were stored on the device from the SmartConfig process,
+              otherwise false to erase existing profiles and start a
+              clean connection
 */
 /**************************************************************************/
-bool Adafruit_CC3000::begin(uint8_t patchReq)
+bool Adafruit_CC3000::begin(uint8_t patchReq, bool useSmartConfigData)
 {
   if (_initialised) return true;
 
@@ -224,7 +233,6 @@ bool Adafruit_CC3000::begin(uint8_t patchReq)
   #endif
 
   init_spi();
-
   
   DEBUGPRINT_F("init\n\r");
   wlan_init(CC3000_UsynchCallback,
@@ -236,25 +244,65 @@ bool Adafruit_CC3000::begin(uint8_t patchReq)
   DEBUGPRINT_F("start\n\r");
 
   wlan_start(patchReq);
-
   
   DEBUGPRINT_F("ioctl\n\r");
-  wlan_ioctl_set_connection_policy(0, 0, 0);
-  wlan_ioctl_del_profile(255);
+  // Check if we should erase previous stored connection details
+  // (most likely written with data from the SmartConfig app)
+  if (!useSmartConfigData)
+  {
+    // Manual connection only (no auto, profiles, etc.)
+    wlan_ioctl_set_connection_policy(0, 0, 0);
+    // Delete previous profiles from memory
+    wlan_ioctl_del_profile(255);
+  }
+  else
+  {
+    // Auto Connect - the C3000 device tries to connect to any AP it detects during scanning:
+    // wlan_ioctl_set_connection_policy(1, 0, 0)
+    
+    // Fast Connect - the CC3000 device tries to reconnect to the last AP connected to:
+    // wlan_ioctl_set_connection_policy(0, 1, 0)
+
+    // Use Profiles - the CC3000 device tries to connect to an AP from profiles:
+    wlan_ioctl_set_connection_policy(0, 0, 1);
+  }
 
   CHECK_SUCCESS(
     wlan_set_event_mask(HCI_EVNT_WLAN_UNSOL_INIT        |
                         //HCI_EVNT_WLAN_ASYNC_PING_REPORT |// we want ping reports
-			//HCI_EVNT_BSD_TCP_CLOSE_WAIT |
+                        //HCI_EVNT_BSD_TCP_CLOSE_WAIT |
                         //HCI_EVNT_WLAN_TX_COMPLETE |
-			HCI_EVNT_WLAN_KEEPALIVE),
+                        HCI_EVNT_WLAN_KEEPALIVE),
                         "WLAN Set Event Mask FAIL", false);
 
-  // Why does calling SSID scan first improve reliability?
-  //scanSSIDs(0);
-  
   _initialised = true;
-  
+
+  // Wait for re-connection is we're using SmartConfig data
+  if (useSmartConfigData)
+  {
+    // Wait for a connection
+    uint32_t timeout = 0;
+    while(!ulCC3000Connected)
+    {
+      cc3k_int_poll();
+      if(timeout > WLAN_CONNECT_TIMEOUT)
+      {
+        if (CC3KPrinter != 0) {
+          CC3KPrinter->println(F("Timed out using SmartConfig data"));
+        }
+        return false;
+      }
+      timeout += 10;
+      delay(10);
+    }
+    
+    delay(1000);  
+    if (ulCC3000DHCP)
+    {
+      mdnsAdvertiser(1, (char *) _deviceName, strlen(_deviceName));
+    }
+  }
+    
   return true;
 }
 
@@ -686,14 +734,15 @@ bool Adafruit_CC3000::startSmartConfig(bool enableAES)
   }
 
   // Reset all the previous configurations
-  //CC3KPrinter->println("Resetting");
   CHECK_SUCCESS(wlan_ioctl_set_connection_policy(WIFI_DISABLE, WIFI_DISABLE, WIFI_DISABLE),
                 "Failed setting the connection policy", false);
+  
+  // Delete existing profile data
   CHECK_SUCCESS(wlan_ioctl_del_profile(255),
                 "Failed deleting existing profiles", false);
 
-  //CC3KPrinter->println("Disconnecting");
-  //Wait until CC3000 is disconnected
+  // CC3KPrinter->println("Disconnecting");
+  // Wait until CC3000 is disconnected
   while (ulCC3000Connected == WIFI_STATUS_CONNECTED) {
     cc3k_int_poll();
     CHECK_SUCCESS(wlan_disconnect(),
@@ -713,8 +762,7 @@ bool Adafruit_CC3000::startSmartConfig(bool enableAES)
   
   // write AES key to NVMEM
   CHECK_SUCCESS(aes_write_key((unsigned char *)(&_smartConfigKey[0])),
-                "Failed writing AES key", false);
-  
+                "Failed writing AES key", false);  
   
   //CC3KPrinter->println("Set prefix");
   // Wait until CC3000 is disconnected
@@ -746,6 +794,7 @@ bool Adafruit_CC3000::startSmartConfig(bool enableAES)
                  "wlan_smart_config_process failed",
                  false);
   }
+  
   // ******************************************************
   // Decrypt configuration information and add profile
   // ToDo: This is causing stack overflow ... investigate
@@ -768,8 +817,7 @@ bool Adafruit_CC3000::startSmartConfig(bool enableAES)
                 //HCI_EVNT_WLAN_ASYNC_PING_REPORT |
                 //HCI_EVNT_WLAN_TX_COMPLETE
                 ),
-                "Failed setting event mask", false);
-  
+                "Failed setting event mask", false);  
 
   // Wait for a connection
   timeout = 0;
