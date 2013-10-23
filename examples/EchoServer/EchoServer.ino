@@ -310,6 +310,15 @@ void setup(void)
     delay(1000);
   }
   
+  /*********************************************************/
+  /* You can safely remove this to save some flash memory! */
+  /*********************************************************/
+  Serial.println(F("\r\nNOTE: This sketch may cause problems with other sketches"));
+  Serial.println(F("since the .disconnect() function is never called, so the"));
+  Serial.println(F("AP may refuse connection requests from the CC3000 until a"));
+  Serial.println(F("timeout period passes.  This is normal behaviour since"));
+  Serial.println(F("there isn't an obvious moment to disconnect with a server.\r\n"));
+  
   // Initialize the echo server
   echoSetup();
 }
