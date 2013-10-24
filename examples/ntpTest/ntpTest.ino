@@ -75,32 +75,32 @@ NetTime_t timeExtract;
 
 #define pF(string_pointer) (reinterpret_cast<const __FlashStringHelper *>(pgm_read_word(string_pointer)))
 
-prog_char   janStr[] PROGMEM = "January";
-prog_char   febStr[] PROGMEM = "February";
-prog_char   marStr[] PROGMEM = "March";
-prog_char   aprStr[] PROGMEM = "April";
-prog_char   mayStr[] PROGMEM = "May";
-prog_char   junStr[] PROGMEM = "June";
-prog_char   julStr[] PROGMEM = "July";
-prog_char   augStr[] PROGMEM = "August";
-prog_char   sepStr[] PROGMEM = "September";
-prog_char   octStr[] PROGMEM = "October";
-prog_char   novStr[] PROGMEM = "November";
-prog_char   decStr[] PROGMEM = "December"; 
+const prog_char   janStr[] PROGMEM = "January";
+const prog_char   febStr[] PROGMEM = "February";
+const prog_char   marStr[] PROGMEM = "March";
+const prog_char   aprStr[] PROGMEM = "April";
+const prog_char   mayStr[] PROGMEM = "May";
+const prog_char   junStr[] PROGMEM = "June";
+const prog_char   julStr[] PROGMEM = "July";
+const prog_char   augStr[] PROGMEM = "August";
+const prog_char   sepStr[] PROGMEM = "September";
+const prog_char   octStr[] PROGMEM = "October";
+const prog_char   novStr[] PROGMEM = "November";
+const prog_char   decStr[] PROGMEM = "December"; 
 
-PROGMEM const char* monthStrs[] = { janStr, febStr, marStr, aprStr, mayStr, junStr,
-                                    julStr, augStr, sepStr, octStr, novStr, decStr}; 
+PROGMEM const char* const monthStrs[] = { janStr, febStr, marStr, aprStr, mayStr, junStr,
+                                          julStr, augStr, sepStr, octStr, novStr, decStr}; 
 
-prog_char   sunStr[] PROGMEM = "Sunday";
-prog_char   monStr[] PROGMEM = "Monday";
-prog_char   tueStr[] PROGMEM = "Tuesday";
-prog_char   wedStr[] PROGMEM = "Wednesday";
-prog_char   thuStr[] PROGMEM = "Thursday";
-prog_char   friStr[] PROGMEM = "Friday";
-prog_char   satStr[] PROGMEM = "Saturday"; 
+const prog_char   sunStr[] PROGMEM = "Sunday";
+const prog_char   monStr[] PROGMEM = "Monday";
+const prog_char   tueStr[] PROGMEM = "Tuesday";
+const prog_char   wedStr[] PROGMEM = "Wednesday";
+const prog_char   thuStr[] PROGMEM = "Thursday";
+const prog_char   friStr[] PROGMEM = "Friday";
+const prog_char   satStr[] PROGMEM = "Saturday"; 
 
-PROGMEM const char* dayStrs[] = { sunStr, monStr, tueStr,  wedStr,
-                                  thuStr, friStr, satStr};
+PROGMEM const char* const dayStrs[] = { sunStr, monStr, tueStr,  wedStr,
+                                        thuStr, friStr, satStr};
 
 
 /**************************************************************************/
