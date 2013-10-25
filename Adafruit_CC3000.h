@@ -80,7 +80,6 @@ class Adafruit_CC3000_Client : public Print {
   uint8_t available(void);
 
   uint8_t _rx_buf[RXBUFFERSIZE], _rx_buf_idx;
-  char    _tx_buf[TXBUFFERSIZE];
   int16_t bufsiz;
 
  private:
