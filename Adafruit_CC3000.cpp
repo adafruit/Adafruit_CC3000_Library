@@ -1274,7 +1274,6 @@ Adafruit_CC3000_Client::Adafruit_CC3000_Client(const Adafruit_CC3000_Client& cop
   bufsiz = copy.bufsiz;
   _rx_buf_idx = copy._rx_buf_idx;
   memcpy(_rx_buf, copy._rx_buf, RXBUFFERSIZE);
-  memcpy(_tx_buf, copy._tx_buf, TXBUFFERSIZE);
 }
 
 void Adafruit_CC3000_Client::operator=(const Adafruit_CC3000_Client& other) {
@@ -1283,7 +1282,6 @@ void Adafruit_CC3000_Client::operator=(const Adafruit_CC3000_Client& other) {
   bufsiz = other.bufsiz;
   _rx_buf_idx = other._rx_buf_idx;
   memcpy(_rx_buf, other._rx_buf, RXBUFFERSIZE);
-  memcpy(_tx_buf, other._tx_buf, TXBUFFERSIZE);
 }
 
 bool Adafruit_CC3000_Client::connected(void) { 
