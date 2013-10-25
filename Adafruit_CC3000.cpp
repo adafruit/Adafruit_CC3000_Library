@@ -1268,6 +1268,22 @@ Adafruit_CC3000_Client::Adafruit_CC3000_Client(uint16_t s) {
   _rx_buf_idx = 0;
 }
 
+Adafruit_CC3000_Client::Adafruit_CC3000_Client(const Adafruit_CC3000_Client& copy) {
+  // Copy all the members to construct this client.
+  _socket = copy._socket;
+  bufsiz = copy.bufsiz;
+  _rx_buf_idx = copy._rx_buf_idx;
+  memcpy(_rx_buf, copy._rx_buf, RXBUFFERSIZE);
+}
+
+void Adafruit_CC3000_Client::operator=(const Adafruit_CC3000_Client& other) {
+  // Copy all the members to assign a new value to this client.
+  _socket = other._socket;
+  bufsiz = other.bufsiz;
+  _rx_buf_idx = other._rx_buf_idx;
+  memcpy(_rx_buf, other._rx_buf, RXBUFFERSIZE);
+}
+
 bool Adafruit_CC3000_Client::connected(void) { 
   if (_socket < 0) return false;
 

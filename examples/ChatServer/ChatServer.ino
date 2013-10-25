@@ -1,15 +1,10 @@
 
 /***************************************************
-  Adafruit CC3000 Breakout/Shield TCP Echo Server
+  Adafruit CC3000 Breakout/Shield TCP Chat Server
     
-  This is a simple implementation of the echo 
-  protocol, RFC 862 http://tools.ietf.org/html/rfc862 , 
-  for the Arduino platform and Adafruit CC3000 breakout
-  or shield.  This sketch will create a TCP server that 
-  listens by default on port 7 and echos back any data
-  received.  Up to 3 clients can be connected concurrently
-  to the server.  This sketch is meant as an example of how 
-  to write a simple server with the Arduino and CC3000.
+  This is a simple chat server which allows clients to connect
+  with telnet and exchange messages.  Anything sent by one
+  client will be written out to all connected clients.
 
   See the CC3000 tutorial on Adafruit's learning system
   for more information on setting up and using the
@@ -35,18 +30,17 @@
   the IP address of the server and start listening for 
   connections.  Once listening for connections, connect
   to the server from your computer  using a telnet client
-  on port 7.  
+  on port 23.  
            
   For example on Linux or Mac OSX, if your CC3000 has an
   IP address 192.168.1.100 you would execute in a command
   window:
   
-    telnet 192.168.1.100 7
+    telnet 192.168.1.100 23
            
-  After connecting, notice that as you type input and 
-  press enter to send it the CC3000 will echo back exactly
-  what you typed.  Press ctrl-] and type quit at the prompt 
-  to close the telnet session.
+  Connect multiple clients and notice that whatever one client
+  sends will be echoed to all other clients.  Press ctrl-] and 
+  type quit at the prompt to close the telnet session.
            
   On Windows you'll need to download a telnet client.  PuTTY 
   is a good, free GUI client: 
@@ -91,9 +85,9 @@ Adafruit_CC3000 cc3000 = Adafruit_CC3000(ADAFRUIT_CC3000_CS, ADAFRUIT_CC3000_IRQ
 // Security can be WLAN_SEC_UNSEC, WLAN_SEC_WEP, WLAN_SEC_WPA or WLAN_SEC_WPA2
 #define WLAN_SECURITY   WLAN_SEC_WPA2
 
-#define LISTEN_PORT           7    // What TCP port to listen on for connections.  The echo protocol uses port 7.
+#define LISTEN_PORT           23    // What TCP port to listen on for connections.
 
-Adafruit_CC3000_Server echoServer(LISTEN_PORT);
+Adafruit_CC3000_Server chatServer(LISTEN_PORT);
 
 void setup(void)
 {
@@ -127,7 +121,7 @@ void setup(void)
   while (! displayConnectionDetails()) {
     delay(1000);
   }
-
+  
   /*********************************************************/
   /* You can safely remove this to save some flash memory! */
   /*********************************************************/
@@ -136,9 +130,9 @@ void setup(void)
   Serial.println(F("AP may refuse connection requests from the CC3000 until a"));
   Serial.println(F("timeout period passes.  This is normal behaviour since"));
   Serial.println(F("there isn't an obvious moment to disconnect with a server.\r\n"));
-  
+
   // Start listening for connections
-  echoServer.begin();
+  chatServer.begin();
   
   Serial.println(F("Listening for connections..."));
 }
@@ -146,13 +140,13 @@ void setup(void)
 void loop(void)
 {
   // Try to get a client which is connected.
-  Adafruit_CC3000_ClientRef client = echoServer.available();
+  Adafruit_CC3000_ClientRef client = chatServer.available();
   if (client) {
      // Check if there is data available to read.
      if (client.available() > 0) {
        // Read a byte and write it to all clients.
        uint8_t ch = client.read();
-       client.write(ch);
+       chatServer.write(ch);
      }
   }
 }

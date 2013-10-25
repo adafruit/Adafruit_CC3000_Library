@@ -64,7 +64,12 @@ class Adafruit_CC3000_Client : public Print {
  public:
   Adafruit_CC3000_Client(uint16_t s);
   Adafruit_CC3000_Client(void);
+  Adafruit_CC3000_Client(const Adafruit_CC3000_Client& copy);
+  void operator=(const Adafruit_CC3000_Client& other);
   
+  // NOTE: If public functions below are added/modified/removed please make sure to update the 
+  // Adafruit_CC3000_ClientRef class to match!
+
   bool connected(void);
   size_t write(uint8_t c);
 
@@ -86,6 +91,12 @@ class Adafruit_CC3000_Client : public Print {
   int16_t _socket;
 
 };
+
+// Ugly but necessary to include the server header after the client is fully defined.
+// A forward reference in the server header won't cut it because the server needs to contain
+// instances of the client.  The client definition above can be pulled into a separate
+// header in a later change to make this cleaner.
+#include "Adafruit_CC3000_Server.h"
 
 class Adafruit_CC3000 {
   public:
