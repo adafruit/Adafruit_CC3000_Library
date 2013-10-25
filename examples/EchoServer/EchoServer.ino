@@ -92,190 +92,8 @@ Adafruit_CC3000 cc3000 = Adafruit_CC3000(ADAFRUIT_CC3000_CS, ADAFRUIT_CC3000_IRQ
 #define WLAN_SECURITY   WLAN_SEC_WPA2
 
 #define LISTEN_PORT           7    // What TCP port to listen on for connections.  The echo protocol uses port 7.
-#define MAX_CLIENTS           3    // The CC3000 docs advise that it has 4 sockets available to client code.
-                                   // One socket is consumed listening for new connections, and the remaining sockets
-                                   // are available for client connections.
-                                   // In practice it appears you can go higher than 4 sockets (up to about 7), but
-                                   // be careful as it might cause the CC3000 to behave unexpectedly.
 
-// Define a simple forward linked list structure to keep track of 
-// connected clients.  This client list is kept as a linked list 
-// because the CC3000 client instances have a non-trivial amount of 
-// internal state (buffers, etc.) which we don't want to spend memory 
-// consuming unless a client is connected.  Because the size of the list
-// is small and random access to entries is rare (happens only on
-// disconnect) a forward list (i.e. no back/previous pointer) is
-// sufficient.
-struct ClientList {
-  int socket;
-  Adafruit_CC3000_Client client;
-  ClientList* next;
-};
-
-// Global variable to hold the ID of the listening socket.
-int listenSocket;
-
-// Global variable to hold the start of the connected client list.
-ClientList* clients;
-
-// Global variable to keep track of how many clients are connected.
-int clientCount;
-
-// Function to add a new client to the connected client list.
-void addNewClient(int socket) {
-  // Allocate memory for a new list entry.
-  // In general be very careful with heap/dynamic memory use in an Arduino sketch
-  // because the function stack and heap share the same limited amount of memory and
-  // can easily overflow.  In this case the number of connected clients is low
-  // so the risk of using up all the memory is low.
-  ClientList* client = (ClientList*) malloc(sizeof(ClientList));
-  if (client == NULL) {
-    Serial.println(F("Error! Couldn't allocate space to store a new client."));
-    return;
-  }
-  // Setup the new client as the front of the connected client list.
-  client->next = clients;
-  client->socket = socket;
-  client->client = Adafruit_CC3000_Client(socket);
-  clients = client;
-  // Increment the count of connected clients.
-  clientCount++;
-}
-
-// Remove a client from the connected client list.
-void removeClient(struct ClientList* client) {
-  if (client == NULL) {
-    // Handle null client to delete.  This should never happen
-    // but is good practice as a precaution.
-    return;
-  }
-  if (clients == client) {
-    // Handle the client to delete being at the front of the list.
-    clients = client->next;
-  }
-  else {
-    // Handle the client to delete being somewhere inside the list.
-    // Iterate through the list until we find the entry before the
-    // client to delete.
-    ClientList* i = clients;
-    while (i != NULL && i->next != client) {
-      i = i->next;
-    }
-    if (i == NULL) {
-      // Couldn't find the client to delete, do nothing.
-      return;
-    }
-    // Remove the client from the list.
-    i->next = client->next;
-  }
-  // Free the memory associated with the client and set the
-  // pointer to null as a precaution against dangling references.
-  free(client);
-  client = NULL;
-  // Decrement the count of connected clients.
-  clientCount--;
-}
-
-// Set up the echo server and start listening for connections.  Should be called once
-// in the setup function of the Arduino sketch.
-void echoSetup() {
-  // Most of the calls below are to CC3000 firmware API's. You can find the documentaiton for these calls at:
-  //   http://software-dl.ti.com/ecs/simplelink/cc3000/public/doxygen_API/v1.11.1/html/index.html
-  
-  // Set the CC3000 inactivity timeout to 0 (never timeout).  This will ensure the CC3000
-  // does not close the listening socket when it's idle for more than 60 seconds (the
-  // default timeout).  See more information from:
-  //   http://e2e.ti.com/support/low_power_rf/f/851/t/292664.aspx
-  unsigned long aucDHCP       = 14400;
-  unsigned long aucARP        = 3600;
-  unsigned long aucKeepalive  = 30;
-  unsigned long aucInactivity = 0;
-  if (netapp_timeout_values(&aucDHCP, &aucARP, &aucKeepalive, &aucInactivity) != 0) {
-    Serial.println(F("Error setting inactivity timeout!"));
-    while(1);
-  }
-  // Create a TCP socket
-  listenSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-  if (listenSocket < 0) {
-    Serial.println(F("Couldn't create listening socket!"));
-    while(1);
-  }
-  // Set the socket's accept call as non-blocking.
-  // This is required to support multiple clients accessing the server at once.  If the listening
-  // port is not set as non-blocking your code can't do anything while it waits for a client to connect.
-  if (setsockopt(listenSocket, SOL_SOCKET, SOCKOPT_ACCEPT_NONBLOCK, SOCK_ON, sizeof(SOCK_ON)) < 0) {
-    Serial.println(F("Couldn't set socket as non-blocking!"));
-    while(1);
-  }
-  // Bind the socket to a TCP address.
-  sockaddr_in address;
-  address.sin_family = AF_INET;
-  address.sin_addr.s_addr = htonl(0);     // Listen on any network interface, equivalent to INADDR_ANY in sockets programming.
-  address.sin_port = htons(LISTEN_PORT);  // Listen on the specified port.
-  if (bind(listenSocket, (sockaddr*) &address, sizeof(address)) < 0) {
-    Serial.println(F("Error binding listen socket to address!"));
-    while(1);
-  }
-  // Start listening for connectings.
-  // The backlog parameter is 0 as it is not supported on TI's CC3000 firmware.
-  if (listen(listenSocket, 0) < 0) {
-    Serial.println(F("Error opening socket for listening!"));
-    while(1);
-  }
-  // Initialize client list as empty.
-  clients = NULL;
-  clientCount = 0;
-  Serial.println(F("Listening for connections..."));
-}
-
-// Update the state of clients, and accept new client connections.  Should be called
-// by the Arduino sketch's loop function.
-void echoLoop() {  
-  // Iterate through all the connected clients.
-  ClientList* i = clients;
-  while (i != NULL) {
-    // Save the next client so the current one can be removed when it disconnects
-    // without breaking iteration through the clients.
-    ClientList* next = i->next;
-    // If there's data available, read it a character at a time from the
-    // CC3000 library's internal buffer.
-    while (i->client.available() > 0) {
-      uint8_t ch = i->client.read();
-      // Echo the read byte back out to the client immediately.
-      if (i->client.write(ch) == 0) {
-        Serial.println(F("Error writing character to client!"));
-      }
-    }
-    // Check if the client is disconnected and remove it from the active client list.
-    if (!i->client.connected()) {
-      Serial.print(F("Client on socket "));
-      Serial.print(i->socket);
-      Serial.println(F(" disconnected."));
-      removeClient(i);
-      // Note that i is now NULL!  Don't try to dereference it or you will
-      // have a bad day (your Arduino will reset).
-    }
-    // Continue iterating through clients.
-    i = next;
-  }
-  // Handle new client connections if we aren't at the limit of connected clients.
-  if (clientCount < MAX_CLIENTS) {
-    // Accept a new socket connection.  Because we set the listening socket to be non-blocking 
-    // this will quickly return a result with either a new socket, an indication that nothing
-    // is trying to connect, or an error.
-    // The NULL parameters allow you to read the address of the connected client but are
-    // unused in this sketch.  See TI's documentation (linked in the setup function) for
-    // more details.
-    int newSocket = accept(listenSocket, NULL, NULL);
-    // Check if a client is connected to a new socket.
-    if (newSocket > -1) {
-      Serial.print(F("New client connected on socket "));
-      Serial.println(newSocket);
-      // Add the client to the list of connected clients.
-      addNewClient(newSocket);
-    }
-  }
-}
+Adafruit_CC3000_Server echoServer(LISTEN_PORT);
 
 void setup(void)
 {
@@ -309,15 +127,34 @@ void setup(void)
   while (! displayConnectionDetails()) {
     delay(1000);
   }
+
+  /*********************************************************/
+  /* You can safely remove this to save some flash memory! */
+  /*********************************************************/
+  Serial.println(F("\r\nNOTE: This sketch may cause problems with other sketches"));
+  Serial.println(F("since the .disconnect() function is never called, so the"));
+  Serial.println(F("AP may refuse connection requests from the CC3000 until a"));
+  Serial.println(F("timeout period passes.  This is normal behaviour since"));
+  Serial.println(F("there isn't an obvious moment to disconnect with a server.\r\n"));
   
-  // Initialize the echo server
-  echoSetup();
+  // Start listening for connections
+  echoServer.begin();
+  
+  Serial.println(F("Listening for connections..."));
 }
 
 void loop(void)
 {
-  // Update the echo server.
-  echoLoop();
+  // Try to get a client which is connected.
+  Adafruit_CC3000_ClientRef client = echoServer.available();
+  if (client) {
+     // Check if there is data available to read.
+     if (client.available() > 0) {
+       // Read a byte and write it to all clients.
+       uint8_t ch = client.read();
+       client.write(ch);
+     }
+  }
 }
 
 /**************************************************************************/

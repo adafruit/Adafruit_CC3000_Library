@@ -132,17 +132,20 @@ void Adafruit_CC3000_Server::begin() {
   unsigned long aucARP        = 3600;
   unsigned long aucKeepalive  = 30;
   unsigned long aucInactivity = 0;
+  cc3k_int_poll();
   if (netapp_timeout_values(&aucDHCP, &aucARP, &aucKeepalive, &aucInactivity) != 0) {
     CC3K_PRINTLN_F("Error setting inactivity timeout!");
     return;
   }
   // Create a TCP socket
+  cc3k_int_poll();
   uint16_t soc = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
   if (soc < 0) {
     CC3K_PRINTLN_F("Couldn't create listening socket!");
     return;
   }
   // Set the socket's accept call as non-blocking.
+  cc3k_int_poll();
   if (setsockopt(soc, SOL_SOCKET, SOCKOPT_ACCEPT_NONBLOCK, SOCK_ON, sizeof(SOCK_ON)) < 0) {
     CC3K_PRINTLN_F("Couldn't set socket as non-blocking!");
     return;
@@ -152,12 +155,14 @@ void Adafruit_CC3000_Server::begin() {
   address.sin_family = AF_INET;
   address.sin_addr.s_addr = htonl(0);     // Listen on any network interface, equivalent to INADDR_ANY in sockets programming.
   address.sin_port = htons(_port);        // Listen on the specified port.
+  cc3k_int_poll();
   if (bind(soc, (sockaddr*) &address, sizeof(address)) < 0) {
     CC3K_PRINTLN_F("Error binding listen socket to address!");
     return;
   }
   // Start listening for connections.
   // The backlog parameter is 0 as it is not supported on TI's CC3000 firmware.
+  cc3k_int_poll();
   if (listen(soc, 0) < 0) {
     CC3K_PRINTLN_F("Error opening socket for listening!");
     return;
@@ -194,6 +199,7 @@ void Adafruit_CC3000_Server::acceptNewConnections() {
       // socket this call will not block and instead return SOC_IN_PROGRESS (-2) 
       // if there are no pending client connections. Also, the address of the 
       // connected client is not needed, so those parameters are set to NULL.
+      cc3k_int_poll();
       int soc = accept(_listenSocket, NULL, NULL);
       if (soc > -1) {
         _clients[i] = Adafruit_CC3000_Client(soc);
