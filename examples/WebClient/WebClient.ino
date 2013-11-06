@@ -46,6 +46,10 @@ Adafruit_CC3000 cc3000 = Adafruit_CC3000(ADAFRUIT_CC3000_CS, ADAFRUIT_CC3000_IRQ
 // Security can be WLAN_SEC_UNSEC, WLAN_SEC_WEP, WLAN_SEC_WPA or WLAN_SEC_WPA2
 #define WLAN_SECURITY   WLAN_SEC_WPA2
 
+#define IDLE_TIMEOUT_MS  3000      // Amount of time to wait (in milliseconds) with no data 
+                                   // received before closing the connection.  If you know the server
+                                   // you're accessing is quick to respond, you can reduce this value.
+
 // What page to grab!
 #define WEBSITE      "www.adafruit.com"
 #define WEBPAGE      "/testwifi/index.html"
@@ -116,15 +120,16 @@ void setup(void)
   Serial.print(replies); Serial.println(F(" replies"));
   */  
 
-  /* Try connecting to the website */
+  /* Try connecting to the website.
+     Note: HTTP/1.1 protocol is used to keep the server from closing the connection before all data is read.
+  */
   Adafruit_CC3000_Client www = cc3000.connectTCP(ip, 80);
   if (www.connected()) {
     www.fastrprint(F("GET "));
     www.fastrprint(WEBPAGE);
-    www.fastrprint(F(" HTTP/1.0\r\n"));
-    www.fastrprint(F("Host: ")); www.fastrprint(WEBSITE); www.fastrprint(F("\n"));
-    www.fastrprint(F("Connection: close\n"));
-    www.fastrprint(F("\n"));
+    www.fastrprint(F(" HTTP/1.1\r\n"));
+    www.fastrprint(F("Host: ")); www.fastrprint(WEBSITE); www.fastrprint(F("\r\n"));
+    www.fastrprint(F("\r\n"));
     www.println();
   } else {
     Serial.println(F("Connection failed"));    
@@ -132,11 +137,14 @@ void setup(void)
   }
 
   Serial.println(F("-------------------------------------"));
-
-  while (www.connected()) {
+  
+  /* Read data until either the connection is closed, or the idle timeout is reached. */ 
+  unsigned long lastRead = millis();
+  while (www.connected() && (millis() - lastRead < IDLE_TIMEOUT_MS)) {
     while (www.available()) {
       char c = www.read();
       Serial.print(c);
+      lastRead = millis();
     }
   }
   www.close();
