@@ -436,7 +436,7 @@ void SpiReadHeader(void)
 {
   DEBUGPRINT_F("\tCC3000: SpiReadHeader\n\r");
 
-  SpiReadDataSynchronous(sSpiInformation.pRxPacket, 10);
+  SpiReadDataSynchronous(sSpiInformation.pRxPacket, HEADERS_SIZE_EVNT);
 }
 
 /**************************************************************************/
@@ -469,7 +469,7 @@ long SpiReadDataCont(void)
 
         if (data_to_recv)
         {
-          SpiReadDataSynchronous(evnt_buff + 10, data_to_recv);
+          SpiReadDataSynchronous(evnt_buff + HEADERS_SIZE_EVNT, data_to_recv);
         }
         break;
       }
@@ -487,7 +487,7 @@ long SpiReadDataCont(void)
 
         if (data_to_recv)
         {
-          SpiReadDataSynchronous(evnt_buff + 10, data_to_recv);
+          SpiReadDataSynchronous(evnt_buff + HEADERS_SIZE_EVNT, data_to_recv);
         }
 
         sSpiInformation.ulSpiState = eSPI_STATE_READ_EOT;
