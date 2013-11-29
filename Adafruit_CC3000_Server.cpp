@@ -139,7 +139,7 @@ void Adafruit_CC3000_Server::begin() {
   }
   // Create a TCP socket
   cc3k_int_poll();
-  uint16_t soc = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+  int16_t soc = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
   if (soc < 0) {
     CC3K_PRINTLN_F("Couldn't create listening socket!");
     return;
