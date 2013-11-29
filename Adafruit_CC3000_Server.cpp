@@ -146,7 +146,8 @@ void Adafruit_CC3000_Server::begin() {
   }
   // Set the socket's accept call as non-blocking.
   cc3k_int_poll();
-  if (setsockopt(soc, SOL_SOCKET, SOCKOPT_ACCEPT_NONBLOCK, SOCK_ON, sizeof(SOCK_ON)) < 0) {
+  char arg = SOCK_ON; // nsd: looked in TI example code and they pass this as a 'short' in one example, and 'char' in two others. 'char' seems as likely work, and has no endianess issue
+  if (setsockopt(soc, SOL_SOCKET, SOCKOPT_ACCEPT_NONBLOCK, &arg, sizeof(arg)) < 0) {
     CC3K_PRINTLN_F("Couldn't set socket as non-blocking!");
     return;
   }
