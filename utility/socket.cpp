@@ -731,7 +731,7 @@ int
 setsockopt(long sd, long level, long optname, const void *optval,
 					 socklen_t optlen)
 {
-	int ret;
+	long ret;
 	unsigned char *ptr, *args;
 	
 	ptr = tSLInformation.pucTxCommandBuffer;
@@ -1162,7 +1162,7 @@ sendto(long sd, const void *buf, long len, long flags, const sockaddr *to,
 int
 mdnsAdvertiser(unsigned short mdnsEnabled, char * deviceServiceName, unsigned short deviceServiceNameLength)
 {
-	int ret;
+	char ret;
  	unsigned char *pTxBuffer, *pArgs;
 	
 	if (deviceServiceNameLength > MDNS_DEVICE_SERVICE_MAX_LENGTH)
