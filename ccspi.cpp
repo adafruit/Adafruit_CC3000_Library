@@ -382,14 +382,12 @@ long SpiWrite(unsigned char *pUserBuffer, unsigned short usLength)
 /**************************************************************************/
 void SpiWriteDataSynchronous(unsigned char *data, unsigned short size)
 {
-  unsigned char dummy;
-  
   DEBUGPRINT_F("\tCC3000: SpiWriteDataSynchronous Start\n\r");
 
-  uint8_t loc;
+  unsigned short loc;
   for (loc = 0; loc < size; loc ++) 
   {
-    dummy = SPI.transfer(data[loc]);
+      SPI.transfer(data[loc]);
 #if (DEBUG_MODE == 1)
       if (!(loc==size-1))
       {
@@ -414,7 +412,7 @@ void SpiWriteDataSynchronous(unsigned char *data, unsigned short size)
 /**************************************************************************/
 void SpiReadDataSynchronous(unsigned char *data, unsigned short size)
 {
-  int i = 0;
+  unsigned short i = 0;
   
   DEBUGPRINT_F("\tCC3000: SpiReadDataSynchronous\n\r");
   SPI.setDataMode(SPI_MODE1);
