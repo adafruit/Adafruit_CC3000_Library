@@ -569,10 +569,10 @@ bool Adafruit_CC3000::getIPAddress(uint32_t *retip, uint32_t *netmask, uint32_t 
   if (ipconfig.aucIP[3] == 0) return false;
 
   memcpy(retip, ipconfig.aucIP, 4);
-  memcpy(netmask, ipconfig.aucIP+4, 4);
-  memcpy(gateway, ipconfig.aucIP+8, 4);
-  memcpy(dhcpserv, ipconfig.aucIP+12, 4);
-  memcpy(dnsserv, ipconfig.aucIP+16, 4);
+  memcpy(netmask, ipconfig.aucSubnetMask, 4);
+  memcpy(gateway, ipconfig.aucDefaultGateway, 4);
+  memcpy(dhcpserv, ipconfig.aucDHCPServer, 4);
+  memcpy(dnsserv, ipconfig.aucDNSServer, 4);
 
   return true;
 }
@@ -726,7 +726,6 @@ bool Adafruit_CC3000::startSmartConfig(bool enableAES)
   ulCC3000DHCP = 0;
   OkToDoShutDown=0;
 
-  uint8_t    loop = 0;
   uint32_t   timeout = 0;
 
   if (!_initialised) {
@@ -950,9 +949,6 @@ void CC3000_UsynchCallback(long lEventType, char * data, unsigned char length)
 #ifndef CC3000_TINY_DRIVER
 bool Adafruit_CC3000::connectSecure(const char *ssid, const char *key, int32_t secMode)
 {
-  int8_t  _key[MAXLENGTHKEY];
-  uint8_t _ssid[MAXSSID];
-  
   if (!_initialised) {
     return false;
   }
@@ -1059,7 +1055,7 @@ uint16_t Adafruit_CC3000::ping(uint32_t ip, uint8_t attempts, uint16_t timeout, 
   if (!ulCC3000Connected) return 0;
   if (!ulCC3000DHCP) return 0;
 
-  uint32_t revIP = (ip >> 24) | (ip >> 8) & 0xFF00 | (ip << 8) & 0xFF0000 | (ip << 24);
+  uint32_t revIP = (ip >> 24) | ((ip >> 8) & 0xFF00) | ((ip & 0xFF00) << 8) | (ip << 24);
 
   pingReportnum = 0;
   pingReport.packets_received = 0;
