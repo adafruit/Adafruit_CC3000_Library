@@ -329,8 +329,8 @@ accept(long sd, sockaddr *addr, socklen_t *addrlen)
 	
 	
 	// need specify return parameters!!!
-	memcpy(addr, &tAcceptReturnArguments.tSocketAddress, ASIC_ADDR_LEN);
-	*addrlen = ASIC_ADDR_LEN;
+	if (addr) memcpy(addr, &tAcceptReturnArguments.tSocketAddress, ASIC_ADDR_LEN);
+	if (addrlen) *addrlen = ASIC_ADDR_LEN;
 	errno = tAcceptReturnArguments.iStatus; 
 	ret = errno;
 	
