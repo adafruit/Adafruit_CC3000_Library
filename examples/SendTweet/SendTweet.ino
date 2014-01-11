@@ -88,7 +88,7 @@ POSSIBILITY OF SUCH DAMAGE.
 // On an UNO, SCK = 13, MISO = 12, and MOSI = 11
 Adafruit_CC3000 cc3000 = Adafruit_CC3000(
   ADAFRUIT_CC3000_CS, ADAFRUIT_CC3000_IRQ, ADAFRUIT_CC3000_VBAT,
-  SPI_CLOCK_DIV2);
+  SPI_CLOCK_DIVIDER);
 
 // WiFi access point credentials
 #define WLAN_SSID     "myNetwork"  // 32 characters max
