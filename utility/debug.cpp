@@ -29,6 +29,15 @@
             in RAM ... useful for debugging!
 */
 /**************************************************************************/
+
+#if defined (__arm__) && defined (__SAM3X8E__) // Arduino Due
+// should use uinstd.h to define sbrk but on Arduino Due this causes a conflict
+extern "C" char* sbrk(int incr);
+int getFreeRam(void) {
+  char top;
+  return &top - reinterpret_cast<char*>(sbrk(0));
+}
+#else // AVR 
 int getFreeRam(void)
 {
   extern int  __bss_end;
@@ -43,6 +52,7 @@ int getFreeRam(void)
 
   return free_memory;
 } 
+#endif
 
 void displayFreeRam(void)
 {

@@ -30,6 +30,12 @@
 #include "utility/netapp.h"
 #include "ccspi.h"
 
+#if defined(__arm__) && defined(__SAM3X8E__) // Arduino Due
+  #define SPI_CLOCK_DIVIDER 6 // used to set the speed for the SPI bus; 6 == 14 Mhz on the Arduino Due
+#else
+  #define SPI_CLOCK_DIVIDER SPI_CLOCK_DIV128
+#endif
+
 #define WLAN_CONNECT_TIMEOUT 10000  // how long to wait, in milliseconds
 #define RXBUFFERSIZE  64 // how much to buffer on the incoming side
 #define TXBUFFERSIZE  32 // how much to buffer on the outgoing side
@@ -100,7 +106,7 @@ class Adafruit_CC3000_Client : public Print {
 
 class Adafruit_CC3000 {
   public:
-  Adafruit_CC3000(uint8_t csPin, uint8_t irqPin, uint8_t vbatPin, uint8_t spispeed = SPI_CLOCK_DIV128);
+  Adafruit_CC3000(uint8_t csPin, uint8_t irqPin, uint8_t vbatPin, uint8_t spispeed = SPI_CLOCK_DIVIDER);
     bool     begin(uint8_t patchReq = 0, bool useSmartConfigData = false);
     void     reboot(uint8_t patchReq = 0);
     void     stop(void);
