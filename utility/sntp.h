@@ -354,7 +354,7 @@ typedef struct NetTime_t
 	uint8_t	 wday;	 ///< Days since Sunday (0..6)
 	uint16_t yday;   ///< Days since January 1 (0..365)
 	bool	 isdst;  ///< Daylight savings time flag, currently not supported
-};
+}NetTime_t;
 
 
 class sntp
