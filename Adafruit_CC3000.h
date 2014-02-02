@@ -33,7 +33,8 @@
 #if defined(__arm__) && defined(__SAM3X8E__) // Arduino Due
   #define SPI_CLOCK_DIVIDER 6 // used to set the speed for the SPI bus; 6 == 14 Mhz on the Arduino Due
 #else
-  #define SPI_CLOCK_DIVIDER SPI_CLOCK_DIV128
+  #define SPI_CLOCK_DIVIDER SPI_CLOCK_DIV2 // Don't set this to a slower speed (i.e. larger div value)
+                                           // or communication will be flakey on 16mhz chips!
 #endif
 
 #define WLAN_CONNECT_TIMEOUT 10000  // how long to wait, in milliseconds
