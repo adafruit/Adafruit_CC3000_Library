@@ -102,9 +102,6 @@ extern "C" {
 #define  SOCK_ON                0			// socket non-blocking mode	is enabled		
 #define  SOCK_OFF               1			// socket blocking mode is enabled
 
-#define  TCP_NODELAY            0x0001
-#define  TCP_BSDURGENT          0x7000
-
 #define  MAX_PACKET_SIZE        1500
 #define  MAX_LISTEN_QUEUE       4
 
@@ -373,7 +370,7 @@ extern INT32 listen(INT32 sd, INT32 backlog);
 //
 //*****************************************************************************
 #ifndef CC3000_TINY_DRIVER 
-extern INT16 gethostbyname(const CHAR * hostname, UINT8 usNameLen, UINT32* out_ip_addr);
+extern INT16 gethostbyname(const CHAR * hostname, UINT16 usNameLen, UINT32* out_ip_addr);
 #endif
 
 

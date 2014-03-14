@@ -463,7 +463,7 @@ INT32 listen(INT32 sd, INT32 backlog)
 //*****************************************************************************
 
 #ifndef CC3000_TINY_DRIVER
-INT16 gethostbyname(const CHAR * hostname, UINT8 usNameLen,
+INT16 gethostbyname(const CHAR * hostname, UINT16 usNameLen,
 	UINT32 * out_ip_addr)
 {
 	tBsdGethostbynameParams ret;
@@ -751,7 +751,7 @@ INT16 setsockopt(INT32 sd, INT32 level, INT32 optname, const void *optval,
 	else
 	{
 		errno = ret;
-		return (-1);
+		return ret;
 	}
 }
 #endif
@@ -832,7 +832,7 @@ INT16 getsockopt (INT32 sd, INT32 level, INT32 optname, void *optval, socklen_t 
 	else
 	{
 		errno = tRetParams.iStatus;
-		return (-1);
+		return errno;
 	}
 }
 
