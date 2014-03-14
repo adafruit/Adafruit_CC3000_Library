@@ -123,11 +123,6 @@ extern INT32 aes_write_key(UINT8 *key);
 
 #endif //CC3000_UNENCRYPTED_SMART_CONFIG
 
-//*****************************************************************************
-//
-// Mark the end of the C bindings section for C++ compilers.
-//
-//*****************************************************************************
 #ifdef  __cplusplus
 }
 #endif // __cplusplus
