@@ -341,7 +341,7 @@ UINT8 nvmem_read_sp_version(UINT8* patchVer)
 //!	 
 //*****************************************************************************
 
-UINT8 nvmem_create_entry(UINT32 ulFileId, UINT32 ulNewLen)
+INT32 nvmem_create_entry(UINT32 ulFileId, UINT32 ulNewLen)
 {
 	UINT8 *ptr; 
 	UINT8 *args;
@@ -358,7 +358,7 @@ UINT8 nvmem_create_entry(UINT32 ulFileId, UINT32 ulNewLen)
 	hci_command_send(HCI_CMND_NVMEM_CREATE_ENTRY,ptr, NVMEM_CREATE_PARAMS_LEN);
 	
 	SimpleLinkWaitEvent(HCI_CMND_NVMEM_CREATE_ENTRY, &retval);
-	
+
 	return(retval);
 }
 

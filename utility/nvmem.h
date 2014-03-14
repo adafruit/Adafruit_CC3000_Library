@@ -107,7 +107,7 @@ extern "C" {
 //!  @param  ulOffset    ulOffset in file from where to read  
 //!  @param  buff        output buffer pointer
 //!
-//!  @return       number of bytes read, otherwise error.
+//!  @return       on success 0, error otherwise.
 //!
 //!  @brief       Reads data from the file referred by the ulFileId parameter. 
 //!               Reads data from file ulOffset till length. Err if the file can't
@@ -231,7 +231,7 @@ extern	UINT8 nvmem_read_sp_version(UINT8* patchVer);
 //!              set ulNewLen=0.
 //!	 
 //*****************************************************************************
-extern UINT8 nvmem_create_entry(UINT32 file_id, UINT32 newlen);
+extern INT32 nvmem_create_entry(UINT32 file_id, UINT32 newlen);
 
 
 //*****************************************************************************
