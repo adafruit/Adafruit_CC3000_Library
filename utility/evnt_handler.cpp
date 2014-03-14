@@ -118,7 +118,7 @@
 #define GET_SCAN_RESULTS_FRAME_TIME_OFFSET				(10)
 #define GET_SCAN_RESULTS_SSID_MAC_LENGTH				(38)
 
-
+#define GET_MSS_VAL_RETVAL_OFFSET	(0)
 
 //*****************************************************************************
 //                  GLOBAL VARAIABLES
@@ -243,13 +243,13 @@ UINT8 * hci_event_handler(void *pRetParams, UINT8 *from, UINT8 *fromlen)
 	UINT8 * RecvParams;
 	UINT8 *RetParams;
 
+
 	while (1)
 	{
 		cc3k_int_poll();
 
 		if (tSLInformation.usEventOrDataReceived != 0)
 		{
-
 			pucReceivedData = (tSLInformation.pucReceivedData);
 
 			if (*pucReceivedData == HCI_TYPE_EVNT)
@@ -335,6 +335,13 @@ UINT8 * hci_event_handler(void *pRetParams, UINT8 *from, UINT8 *fromlen)
 									,GET_HOST_BY_NAME_ADDR_OFFSET,*(UINT32 *)pRetParams);
 						break;
 
+					case HCI_EVNT_GETMSSVALUE:
+
+						STREAM_TO_UINT16((CHAR *)pucReceivedParams
+							,GET_MSS_VAL_RETVAL_OFFSET,*(UINT16 *)pRetParams);					
+
+						break;
+
 					case HCI_EVNT_ACCEPT:
 						{
 							STREAM_TO_UINT32((CHAR *)pucReceivedParams,ACCEPT_SD_OFFSET
@@ -358,7 +365,7 @@ UINT8 * hci_event_handler(void *pRetParams, UINT8 *from, UINT8 *fromlen)
 						  STREAM_TO_UINT32((CHAR *)pucReceivedParams,SL_RECEIVE_NUM_BYTES_OFFSET,*(UINT32 *)pRetParams);
 						  pRetParams = ((CHAR *)pRetParams) + 4;
 						  STREAM_TO_UINT32((CHAR *)pucReceivedParams,SL_RECEIVE__FLAGS__OFFSET,*(UINT32 *)pRetParams);
-						  tBsdReadReturnParams *tread = (tBsdReadReturnParams *)pRetParams;
+
 						  if(((tBsdReadReturnParams *)pRetParams)->iNumberOfBytes == ERROR_SOCKET_INACTIVE)
 						    {
 						      set_socket_active_status(((tBsdReadReturnParams *)pRetParams)->iSocketDescriptor,SOCKET_STATUS_INACTIVE);

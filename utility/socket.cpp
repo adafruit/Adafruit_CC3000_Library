@@ -85,7 +85,7 @@
 #define SOCKET_RECV_FROM_PARAMS_LEN			(12)
 #define SOCKET_SENDTO_PARAMS_LEN			(24)
 #define SOCKET_MDNS_ADVERTISE_PARAMS_LEN	(12)
-
+#define SOCKET_GET_MSS_VALUE_PARAMS_LEN		(4)
 
 // The legnth of arguments for the SEND command: sd + buff_offset + len + flags, 
 // while size of each parameter is 32 bit - so the total length is 16 bytes;
@@ -1171,4 +1171,36 @@ INT16 mdnsAdvertiser(UINT16 mdnsEnabled, CHAR * deviceServiceName, UINT16 device
 	
 	return ret;
 	
+}
+
+
+//*****************************************************************************
+//
+//!  getmssvalue
+//!
+//!  @param[in] sd         socket descriptor
+//!
+//!  @return   On success, returns the MSS value of a TCP connection
+//!
+//!  @brief    Returns the MSS value of a TCP connection according to the socket descriptor
+//
+//*****************************************************************************
+UINT16 getmssvalue (INT32 sd)
+{
+	UINT8 *ptr, *args;
+	UINT16 ret;
+
+	ptr = tSLInformation.pucTxCommandBuffer;
+	args = (ptr + HEADERS_SIZE_CMD);
+
+	// Fill in temporary command buffer
+	args = UINT32_TO_STREAM(args, sd);
+
+	// Initiate a HCI command
+	hci_command_send(HCI_CMND_GETMSSVALUE, ptr, SOCKET_GET_MSS_VALUE_PARAMS_LEN);
+
+	// Since we are in blocking state - wait for event complete
+	SimpleLinkWaitEvent(HCI_EVNT_GETMSSVALUE, &ret);
+
+	return ret;
 }

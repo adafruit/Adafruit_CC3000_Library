@@ -671,6 +671,20 @@ extern INT16 sendto(INT32 sd, const void *buf, INT32 len, INT32 flags,
 //*****************************************************************************
 extern INT16 mdnsAdvertiser(UINT16 mdnsEnabled, CHAR * deviceServiceName, UINT16 deviceServiceNameLength);
 
+
+//*****************************************************************************
+//
+//!  getmssvalue
+//!
+//!  @param[in] sd         socket descriptor
+//!
+//!  @return   On success, returns the MSS value of a TCP connection
+//!
+//!  @brief    Returns the MSS value of a TCP connection according to the socket descriptor
+//
+//*****************************************************************************
+extern UINT16 getmssvalue (INT32 sd);
+
 //*****************************************************************************
 //
 // Close the Doxygen group.
