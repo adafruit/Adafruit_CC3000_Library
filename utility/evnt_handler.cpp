@@ -614,7 +614,6 @@ INT32 hci_unsol_event_handler(CHAR *event_hdr)
 		case HCI_EVNT_BSD_TCP_CLOSE_WAIT:
 			{
 			  DEBUGPRINT_F("\tTCP Close Wait\n\r");
-			  uint8_t socketnum;
 			  data = (CHAR*)(event_hdr) + HCI_EVENT_HEADER_SIZE;
 			  /*
 			  printHex(data[0]); PRINT_F("\t");
@@ -624,11 +623,12 @@ INT32 hci_unsol_event_handler(CHAR *event_hdr)
 			  printHex(data[4]); PRINT_F("\t");
 			  printHex(data[5]); PRINT_F("\t");
 			  */
-			  socketnum = data[0];
-			  //STREAM_TO_UINT16(data, 0, socketnum);
 			  if( tSLInformation.sWlanCB )
 			    {
-			      tSLInformation.sWlanCB(event_type, (CHAR *)&socketnum, 1);
+				  //data[0] represents the socket id, for which FIN was received by remote.
+				  //Upon receiving this event, the user can close the socket, or else the 
+				  //socket will be closded after inacvitity timeout (by default 60 seconds)
+			      tSLInformation.sWlanCB(event_type, data, 1);
 			    }
 			}
 			break;
@@ -663,6 +663,12 @@ INT32 hci_unsol_event_handler(CHAR *event_hdr)
                 }
                 else
                     return (0);
+	}
+
+	//handle a case where unsolicited event arrived, but was not handled by any of the cases above
+	if ((event_type != tSLInformation.usRxEventOpcode) && (event_type != HCI_EVNT_PATCHES_REQ))
+	{
+		return(1);
 	}
 
 	return(0);
