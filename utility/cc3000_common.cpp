@@ -146,9 +146,8 @@ UINT16 STREAM_TO_UINT16_f(CHAR* cp, UINT16 offset)
   DEBUGPRINT_F("\n\r");
   */
 
-  return (UINT16)((UINT16)
-		    ((UINT16)(*(p + offset + 1)) << 8) +
-		    (UINT16)(*(p + offset)));
+  return (UINT16)((UINT16)((UINT16)
+          (*(p + offset + 1)) << 8) + (UINT16)(*(p + offset)));
 }
 
 //*****************************************************************************
