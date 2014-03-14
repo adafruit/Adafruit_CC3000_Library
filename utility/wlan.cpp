@@ -131,6 +131,7 @@ static void SimpleLink_Init_Start(UINT16 usPatchesAvailableAtHost)
 
 	// IRQ Line asserted - send HCI_CMND_SIMPLE_LINK_START to CC3000
 	hci_command_send(HCI_CMND_SIMPLE_LINK_START, ptr, WLAN_SL_INIT_START_PARAMS_LEN);
+	
 	SimpleLinkWaitEvent(HCI_CMND_SIMPLE_LINK_START, 0);
 }
 
