@@ -83,7 +83,7 @@ void setup(void)
 */
   
   uint16_t firmware = checkFirmwareVersion();
-  if ((firmware != 0x113) && (firmware != 0x118)) {
+  if ((firmware != 0x113) && (firmware != 0x118) && (firmware != 0x11A)) {
     Serial.println(F("Wrong firmware version!"));
     for(;;);
   }
