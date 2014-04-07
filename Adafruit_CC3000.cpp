@@ -100,7 +100,7 @@ uint8_t pingReportnum;
 netapp_pingreport_args_t pingReport;
 
 #define CC3000_SUCCESS                        (0)
-#define CHECK_SUCCESS(func,Notify,errorCode)  {if ((func) != CC3000_SUCCESS) { if (CC3KPrinter != 0) CC3KPrinter->println(F(Notify)); return errorCode;}}
+#define CHECK_SUCCESS(func,Notify,errorCode)  {if ((func) != CC3000_SUCCESS) { CHECK_PRINTER CC3KPrinter->println(F(Notify)); return errorCode;}}
 
 #define MAXSSID					  (32)
 #define MAXLENGTHKEY 			(32)  /* Cleared for 32 bytes by TI engineering 29/08/13 */
