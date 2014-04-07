@@ -37,6 +37,14 @@
                                            // or communication will be flakey on 16mhz chips!
 #endif
 
+//#define ENABLE_CC3K_PRINTER
+
+#ifdef ENABLE_CC3K_PRINTER
+#define CHECK_PRINTER if(CC3KPrinter != 0)
+#else
+#define CHECK_PRINTER if(false)
+#endif
+
 #define WLAN_CONNECT_TIMEOUT 10000  // how long to wait, in milliseconds
 #define RXBUFFERSIZE  64 // how much to buffer on the incoming side
 #define TXBUFFERSIZE  32 // how much to buffer on the outgoing side
