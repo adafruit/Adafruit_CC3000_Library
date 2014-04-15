@@ -16,7 +16,7 @@
 
 #include "utility/socket.h"
 
-#define CC3K_PRINTLN_F(text) { if(CC3KPrinter != NULL) { CC3KPrinter->println(F(text)); } }
+#define CC3K_PRINTLN_F(text) CHECK_PRINTER { if(CC3KPrinter != NULL) { CC3KPrinter->println(F(text)); } }
 
 #define HANDLE_NULL(client, value) { if (client == NULL) return value; }
 
