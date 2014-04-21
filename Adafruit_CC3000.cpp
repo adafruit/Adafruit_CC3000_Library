@@ -185,8 +185,9 @@ bool Adafruit_CC3000::scanSSIDs(uint32_t time)
     }
   }
 
+  // Set  SSID Scan params to includes channels above 11 
   CHECK_SUCCESS(
-      wlan_ioctl_set_scan_params(time, 20, 100, 5, 0x7FF, -120, 0, 300,
+      wlan_ioctl_set_scan_params(time, 20, 100, 5, 0x1FFF, -120, 0, 300,
           (unsigned long * ) &intervalTime),
           "Failed setting params for SSID scan", false);
 
