@@ -405,7 +405,7 @@ extern int gethostbyname(const char * hostname, uint8_t usNameLen, uint32_t* out
 //!  @sa socket
 //
 //*****************************************************************************
-extern long connect(long sd, const sockaddr *addr, long addrlen);
+extern long connectX(long sd, const sockaddr *addr, long addrlen);
 
 //*****************************************************************************
 //

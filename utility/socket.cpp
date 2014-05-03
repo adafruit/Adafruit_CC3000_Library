@@ -535,7 +535,7 @@ gethostbyname(const char * hostname, uint8_t usNameLen, uint32_t * out_ip_addr)
 //*****************************************************************************
 
 long
-connect(long sd, const sockaddr *addr, long addrlen)
+connectX(long sd, const sockaddr *addr, long addrlen)
 {
 	long int ret;
 	unsigned char *ptr, *args;

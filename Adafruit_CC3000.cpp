@@ -1239,7 +1239,7 @@ Adafruit_CC3000_Client Adafruit_CC3000::connectTCP(uint32_t destIP, uint16_t des
 
   //printHex((byte *)&socketAddress, sizeof(socketAddress));
   //if (CC3KPrinter != 0) CC3KPrinter->print(F("Connecting socket ... "));
-  if (-1 == connect(tcp_socket, &socketAddress, sizeof(socketAddress)))
+  if (-1 == connectX(tcp_socket, &socketAddress, sizeof(socketAddress)))
   {
     CHECK_PRINTER {
 		CC3KPrinter->println(F("Connection error"));
@@ -1289,7 +1289,7 @@ Adafruit_CC3000_Client Adafruit_CC3000::connectUDP(uint32_t destIP, uint16_t des
   }
 
   //printHex((byte *)&socketAddress, sizeof(socketAddress));
-  if (-1 == connect(udp_socket, &socketAddress, sizeof(socketAddress)))
+  if (-1 == connectX(udp_socket, &socketAddress, sizeof(socketAddress)))
   {
     CHECK_PRINTER {
 		CC3KPrinter->println(F("Connection error"));
