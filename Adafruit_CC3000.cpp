@@ -1560,7 +1560,21 @@ void Adafruit_CC3000_Client::flush(){
 }
 
 int Adafruit_CC3000_Client::peek(){
-  return 0;
+  while ((bufsiz <= 0) || (bufsiz == _rx_buf_idx)) {
+    cc3k_int_poll();
+    // buffer in some more data
+    bufsiz = recv(_socket, _rx_buf, sizeof(_rx_buf), 0);
+    if (bufsiz == -57) {
+      close();
+      return 0;
+    }
+    //if (CC3KPrinter != 0) { CC3KPrinter->println("Read "); CC3KPrinter->print(bufsiz); CC3KPrinter->println(" bytes"); }
+    _rx_buf_idx = 0;
+  }
+  uint8_t ret = _rx_buf[_rx_buf_idx];
+
+  //if (CC3KPrinter != 0) { CC3KPrinter->print("("); CC3KPrinter->write(ret); CC3KPrinter->print(")"); }
+  return ret;
 }
 
 void Adafruit_CC3000::setPrinter(Print* p) {
