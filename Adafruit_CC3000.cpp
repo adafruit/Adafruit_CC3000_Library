@@ -1362,7 +1362,9 @@ int Adafruit_CC3000_Client::connect(IPAddress destIP, uint16_t destPort)
   tcp_socket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
   if (-1 == tcp_socket)
   {
-    if (CC3KPrinter != 0) CC3KPrinter->println(F("Failed to open socket"));
+    CHECK_PRINTER {
+      CC3KPrinter->println(F("Failed to open socket"));
+    }
     return 0;
   }
   //CC3KPrinter->print(F("DONE (socket ")); CC3KPrinter->print(tcp_socket); CC3KPrinter->println(F(")"));
@@ -1377,7 +1379,7 @@ int Adafruit_CC3000_Client::connect(IPAddress destIP, uint16_t destPort)
   socketAddress.sa_data[4] = destIP >> 8;
   socketAddress.sa_data[5] = destIP;
 
-  if (CC3KPrinter != 0) {
+  CHECK_PRINTER {
     CC3KPrinter->print(F("\n\rConnect to "));
     CC3KPrinter->print(destIP);
     CC3KPrinter->print(':');
@@ -1388,11 +1390,13 @@ int Adafruit_CC3000_Client::connect(IPAddress destIP, uint16_t destPort)
   //if (CC3KPrinter != 0) CC3KPrinter->print(F("Connecting socket ... "));
   if (-1 == connectX(tcp_socket, &socketAddress, sizeof(socketAddress)))
   {
-    if (CC3KPrinter != 0) CC3KPrinter->println(F("Connection error"));
+    CHECK_PRINTER {
+      CC3KPrinter->println(F("Connection error"));
+    }
     closesocket(tcp_socket);
     return 0;
   }
-  if (CC3KPrinter != 0) CC3KPrinter->println(F("DONE"));
+  // if (CC3KPrinter != 0) CC3KPrinter->println(F("DONE"));
 
   _socket = tcp_socket;
   return 1;
