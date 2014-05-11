@@ -799,7 +799,7 @@ bool Adafruit_CC3000::startSmartConfig(const char *_deviceName, const char *smar
 
   //CC3KPrinter->println("Start config");
   // Start the SmartConfig start process
-  CHECK_SUCCESS(wlan_smart_config_start(0),
+  CHECK_SUCCESS(wlan_smart_config_start(enableAES),
                 "Failed starting smart config", false);
 
   // Wait for smart config process complete (event in CC3000_UsynchCallback)
