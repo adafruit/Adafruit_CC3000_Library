@@ -116,7 +116,7 @@ class Adafruit_CC3000_Client : public Print {
 class Adafruit_CC3000 {
   public:
   Adafruit_CC3000(uint8_t csPin, uint8_t irqPin, uint8_t vbatPin, uint8_t spispeed = SPI_CLOCK_DIVIDER);
-    bool     begin(uint8_t patchReq = 0, bool useSmartConfigData = false);
+    bool     begin(uint8_t patchReq = 0, bool useSmartConfigData = false, const char *_deviceName = NULL);
     void     reboot(uint8_t patchReq = 0);
     void     stop(void);
     bool     disconnect(void);
@@ -149,7 +149,7 @@ class Adafruit_CC3000 {
     uint8_t  getNextSSID(uint8_t *rssi, uint8_t *secMode, char *ssidname);
 
     bool     listSSIDResults(void);
-    bool     startSmartConfig(bool enableAES);
+    bool     startSmartConfig(const char *_deviceName = NULL, const char *smartConfigKey = NULL);
 
     bool     getIPConfig(tNetappIpconfigRetArgs *ipConfig);
 
