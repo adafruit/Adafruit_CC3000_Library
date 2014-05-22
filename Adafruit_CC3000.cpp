@@ -141,13 +141,7 @@ private:
 }cc3000Bitset;
 
 volatile long ulSocket;
-
-char _deviceName[] = "CC3000";
 char _cc3000_prefix[] = { 'T', 'T', 'T' };
-const unsigned char _smartConfigKey[] = { 0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37,
-                                          0x38, 0x39, 0x30, 0x31, 0x32, 0x33, 0x34, 0x35 };
-                                          // AES key for smart config = "0123456789012345"
-
 Print* CC3KPrinter; // user specified output stream for general messages and debug
 
 /* *********************************************************************** */
@@ -185,8 +179,9 @@ bool Adafruit_CC3000::scanSSIDs(uint32_t time)
     }
   }
 
+  // Set  SSID Scan params to includes channels above 11 
   CHECK_SUCCESS(
-      wlan_ioctl_set_scan_params(time, 20, 100, 5, 0x7FF, -120, 0, 300,
+      wlan_ioctl_set_scan_params(time, 20, 100, 5, 0x1FFF, -120, 0, 300,
           (unsigned long * ) &intervalTime),
           "Failed setting params for SSID scan", false);
 
@@ -244,7 +239,7 @@ Adafruit_CC3000::Adafruit_CC3000(uint8_t csPin, uint8_t irqPin, uint8_t vbatPin,
               clean connection
 */
 /**************************************************************************/
-bool Adafruit_CC3000::begin(uint8_t patchReq, bool useSmartConfigData)
+bool Adafruit_CC3000::begin(uint8_t patchReq, bool useSmartConfigData, const char *_deviceName)
 {
   if (_initialised) return true;
 
@@ -311,7 +306,7 @@ bool Adafruit_CC3000::begin(uint8_t patchReq, bool useSmartConfigData)
 
   _initialised = true;
 
-  // Wait for re-connection is we're using SmartConfig data
+  // Wait for re-connection if we're using SmartConfig data
   if (useSmartConfigData)
   {
     // Wait for a connection
@@ -753,8 +748,9 @@ uint8_t Adafruit_CC3000::getNextSSID(uint8_t *rssi, uint8_t *secMode, char *ssid
 */
 /**************************************************************************/
 #ifndef CC3000_TINY_DRIVER
-bool Adafruit_CC3000::startSmartConfig(bool enableAES)
+bool Adafruit_CC3000::startSmartConfig(const char *_deviceName, const char *smartConfigKey)
 {
+  bool enableAES = smartConfigKey != NULL;
   cc3000Bitset.clear();
 
   uint32_t   timeout = 0;
@@ -790,10 +786,12 @@ bool Adafruit_CC3000::startSmartConfig(bool enableAES)
   CHECK_SUCCESS(nvmem_create_entry(NVMEM_AES128_KEY_FILEID,16),
                 "Failed create NVMEM entry", false);
   
-  // write AES key to NVMEM
-  CHECK_SUCCESS(aes_write_key((unsigned char *)(&_smartConfigKey[0])),
-                "Failed writing AES key", false);  
-  
+  if (enableAES)
+  {
+    // write AES key to NVMEM
+    CHECK_SUCCESS(aes_write_key((unsigned char *)(smartConfigKey)),
+                  "Failed writing AES key", false);  
+  }  
   //CC3KPrinter->println("Set prefix");
   // Wait until CC3000 is disconnected
   CHECK_SUCCESS(wlan_smart_config_set_prefix((char *)&_cc3000_prefix),
@@ -801,7 +799,7 @@ bool Adafruit_CC3000::startSmartConfig(bool enableAES)
 
   //CC3KPrinter->println("Start config");
   // Start the SmartConfig start process
-  CHECK_SUCCESS(wlan_smart_config_start(0),
+  CHECK_SUCCESS(wlan_smart_config_start(enableAES),
                 "Failed starting smart config", false);
 
   // Wait for smart config process complete (event in CC3000_UsynchCallback)
