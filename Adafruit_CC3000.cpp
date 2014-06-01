@@ -1384,7 +1384,7 @@ size_t Adafruit_CC3000_Client::fastrprintln(const __FlashStringHelper *ifsh)
 {
   size_t r = 0;
   r = fastrprint(ifsh);
-  r+= fastrprint(F("\n\r"));
+  r+= fastrprint(F("\r\n"));
   return r;
 }
 
@@ -1395,7 +1395,7 @@ size_t Adafruit_CC3000_Client::fastrprintln(const char *str)
   if (len > 0) {
     if ((r = write(str, len, 0)) <= 0) return 0;
   }
-  if ((r += write("\n\r", 2, 0)) <= 0) return 0;  // meme fix
+  if ((r += write("\r\n", 2, 0)) <= 0) return 0;  // meme fix
   return r;
 }
 
