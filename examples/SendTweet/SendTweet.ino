@@ -1,4 +1,17 @@
 /*
+IMPORTANT: THIS SOFTWARE CURRENTLY DOES NOT WORK, and future
+status is uncertain.  Twitter has changed their API to require
+SSL (Secure Sockets Layer) on -all- connections, a complex
+operation beyond the Arduino's ability to handle.  The code is
+being kept around on the chance that a suitable proxy service
+becomes available...but at present we have no such service, no
+code for such, nor a schedule or even a firm commitment to
+pursue it.  For projects requiring Twitter we now recommend
+using an SSL-capable system such as Raspberry Pi.
+*/
+
+
+/*
 Send tweets wirelessly from Arduino using the new Twitter 1.1 API.
 Self-contained, operates directly -- no proxy server required!
 
