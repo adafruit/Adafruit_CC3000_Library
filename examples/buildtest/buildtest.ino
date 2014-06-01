@@ -102,6 +102,36 @@ void setup(void)
     while(1);
   }
 
+  /* Optional: Set a static IP address instead of using DHCP.
+     Note that the setStaticIPAddress function will save its state
+     in the CC3000's internal non-volatile memory and the details
+     will be used the next time the CC3000 connects to a network.
+     This means you only need to call the function once and the
+     CC3000 will remember the connection details.  To switch back
+     to using DHCP, call the setDHCP() function (again only needs
+     to be called once).
+  */
+  /*
+  uint32_t ipAddress = cc3000.IP2U32(192, 168, 1, 19);
+  uint32_t netMask = cc3000.IP2U32(255, 255, 255, 0);
+  uint32_t defaultGateway = cc3000.IP2U32(192, 168, 1, 1);
+  uint32_t dns = cc3000.IP2U32(8, 8, 4, 4);
+  if (!cc3000.setStaticIPAddress(ipAddress, netMask, defaultGateway, dns)) {
+    Serial.println(F("Failed to set static IP!"));
+    while(1);
+  }
+  */
+  /* Optional: Revert back from static IP addres to use DHCP.
+     See note for setStaticIPAddress above, this only needs to be
+     called once and will be remembered afterwards by the CC3000.
+  */
+  /*
+  if (!cc3000.setDHCP()) {
+    Serial.println(F("Failed to set DHCP!"));
+    while(1);
+  }
+  */
+
   /* Attempt to connect to an access point */
   char *ssid = WLAN_SSID;             /* Max 32 chars */
   Serial.print(F("\nAttempting to connect to ")); Serial.println(ssid);
