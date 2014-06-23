@@ -1465,6 +1465,17 @@ size_t Adafruit_CC3000_Client::fastrprint(const char *str)
   }
 }
 
+size_t Adafruit_CC3000_Client::fastrprint(char *str)
+{
+  size_t len = strlen(str);
+  if (len > 0) {
+    return write(str, len, 0);
+  }
+  else {
+    return 0;
+  }
+}
+
 int16_t Adafruit_CC3000_Client::read(void *buf, uint16_t len, uint32_t flags) 
 {
   return recv(_socket, buf, len, flags);
