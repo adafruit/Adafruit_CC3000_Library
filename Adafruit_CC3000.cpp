@@ -1480,6 +1480,7 @@ size_t Adafruit_CC3000_Client::fastrprintln(char *str) {
   size_t r = 0;
   r = fastrprint(str);
   r+= fastrprint(F("\r\n"));
+  return r;
 }
 
 int16_t Adafruit_CC3000_Client::read(void *buf, uint16_t len, uint32_t flags) 
