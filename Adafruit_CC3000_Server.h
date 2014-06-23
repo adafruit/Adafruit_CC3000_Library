@@ -48,6 +48,7 @@ class Adafruit_CC3000_ClientRef : public Print {
   size_t fastrprint(const char *str);
   size_t fastrprintln(const char *str);
   size_t fastrprint(char *str);
+  size_t fastrprintln(char *str);
   size_t fastrprint(const __FlashStringHelper *ifsh);
   size_t fastrprintln(const __FlashStringHelper *ifsh);
 

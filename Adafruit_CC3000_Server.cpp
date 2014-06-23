@@ -59,6 +59,16 @@ size_t Adafruit_CC3000_ClientRef::fastrprintln(const char *str) {
   return _client->fastrprintln(str);
 }
 
+size_t Adafruit_CC3000_ClientRef::fastrprint(char *str) {
+  HANDLE_NULL(_client, 0);
+  return _client->fastrprint(str);
+}
+
+size_t Adafruit_CC3000_ClientRef::fastrprintln(char *str) {
+  HANDLE_NULL(_client, 0);
+  return _client->fastrprintln(str);
+}
+
 size_t Adafruit_CC3000_ClientRef::fastrprint(const __FlashStringHelper *ifsh) {
   HANDLE_NULL(_client, 0);
   return _client->fastrprint(ifsh);
