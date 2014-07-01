@@ -7,7 +7,7 @@
 //   http://processors.wiki.ti.com/index.php/CC3000_Release_Notes
 //
 // In general the 1.13 release is a bug fix release with fixes for stability
-// issues that caused the CC3000 to hand when under load.
+// issues that caused the CC3000 to hang when under load.
 //
 // WARNING: Upgrade firmware at your own risk!  In general if the CC3000 is 
 // currently working fine for your needs then hold off on the upgrade.
@@ -299,11 +299,14 @@ void setup(void)
 
   Serial.println(F("Starting w/patches"));
 
-  if (!cc3000.begin(0))
+  cc3000.reboot();
+  /*
+  if (!)
   {
     Serial.println(F("Unable to initialise the CC3000! Check your wiring?"));
     while(1);
   }
+  */
   Serial.println(F("Patched!"));
   displayFirmwareVersion();
   displayMACAddress();
