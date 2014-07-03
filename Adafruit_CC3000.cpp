@@ -1272,6 +1272,8 @@ Adafruit_CC3000_Client Adafruit_CC3000::connectTCP(uint32_t destIP, uint16_t des
   }
   //CC3KPrinter->print(F("DONE (socket ")); CC3KPrinter->print(tcp_socket); CC3KPrinter->println(F(")"));
 
+  closed_sockets[tcp_socket] = false; // Clear any previous closed event
+
   // Try to open the socket
   memset(&socketAddress, 0x00, sizeof(socketAddress));
   socketAddress.sa_family = AF_INET;
