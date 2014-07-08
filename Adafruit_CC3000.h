@@ -133,7 +133,7 @@ class Adafruit_CC3000 {
     bool     setStaticIPAddress(uint32_t ip, uint32_t subnetMask, uint32_t defaultGateway, uint32_t dnsServer);
     bool     setDHCP();
 
-    bool     connectToAP(const char *ssid, const char *key, uint8_t secmode);
+    bool     connectToAP(const char *ssid, const char *key, uint8_t secmode, uint8_t attempts = 0);
     bool     connectSecure(const char *ssid, const char *key, int32_t secMode);
     bool     connectOpen(const char *ssid); 
     bool     checkConnected(void);

@@ -136,7 +136,10 @@ void setup(void)
   char *ssid = WLAN_SSID;             /* Max 32 chars */
   Serial.print(F("\nAttempting to connect to ")); Serial.println(ssid);
   
-  /* NOTE: Secure connections are not available in 'Tiny' mode! */
+  /* NOTE: Secure connections are not available in 'Tiny' mode!
+     By default connectToAP will retry indefinitely, however you can pass an
+     optional maximum number of retries (greater than zero) as the fourth parameter.
+  */
   if (!cc3000.connectToAP(WLAN_SSID, WLAN_PASS, WLAN_SECURITY)) {
     Serial.println(F("Failed!"));
     while(1);

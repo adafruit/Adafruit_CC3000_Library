@@ -1075,14 +1075,25 @@ bool Adafruit_CC3000::connectSecure(const char *ssid, const char *key, int32_t s
 #endif
 
 // Connect with timeout
-bool Adafruit_CC3000::connectToAP(const char *ssid, const char *key, uint8_t secmode) {
+bool Adafruit_CC3000::connectToAP(const char *ssid, const char *key, uint8_t secmode, uint8_t attempts) {
   if (!_initialised) {
     return false;
   }
 
   int16_t timer;
 
+  // If attempts is zero interpret that as no limit on number of retries.
+  bool retryForever = attempts == 0;
+
   do {
+    // Stop if the max number of attempts have been tried.
+    if (!retryForever) {
+      if (attempts == 0) {
+        return checkConnected();
+      }
+      attempts -= 1;
+    }
+
     cc3k_int_poll();
     /* MEME: not sure why this is absolutely required but the cc3k freaks
        if you dont. maybe bootup delay? */
@@ -1102,8 +1113,8 @@ bool Adafruit_CC3000::connectToAP(const char *ssid, const char *key, uint8_t sec
       /* Connect to an unsecured network */
       if (! connectOpen(ssid)) {
         CHECK_PRINTER {
-			CC3KPrinter->println(F("Failed!"));
-		}
+			    CC3KPrinter->println(F("Failed!"));
+		    }
         continue;
       }
     } else {
@@ -1112,8 +1123,8 @@ bool Adafruit_CC3000::connectToAP(const char *ssid, const char *key, uint8_t sec
       /* Connect to a secure network using WPA2, etc */
       if (! connectSecure(ssid, key, secmode)) {
         CHECK_PRINTER {
-			CC3KPrinter->println(F("Failed!"));
-		}
+			    CC3KPrinter->println(F("Failed!"));
+		    }
         continue;
       }
 #endif
@@ -1123,8 +1134,8 @@ bool Adafruit_CC3000::connectToAP(const char *ssid, const char *key, uint8_t sec
 
     /* Wait around a bit for the async connected signal to arrive or timeout */
     CHECK_PRINTER {
-		CC3KPrinter->print(F("Waiting to connect..."));
-	}
+		  CC3KPrinter->print(F("Waiting to connect..."));
+	  }
     while ((timer > 0) && !checkConnected())
     {
       cc3k_int_poll();
@@ -1133,8 +1144,8 @@ bool Adafruit_CC3000::connectToAP(const char *ssid, const char *key, uint8_t sec
     }
     if (timer <= 0) {
       CHECK_PRINTER {
-		  CC3KPrinter->println(F("Timed out!"));
-	  }
+		    CC3KPrinter->println(F("Timed out!"));
+	    }
     }
   } while (!checkConnected());
 
