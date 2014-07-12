@@ -556,9 +556,18 @@ bool sntp::UpdateNTPTime()
 			{
 				//start with user's NTP servers.  These may not be pool servers, so they'll only get one IP address from DNS
 				ntp_pool_list = m_userServers;            //start with user's ntp server list
+        m_localPool = ntp_us_pool_list;
+        m_globalPool = ntp_global_pool_list;
 				checkLocal = (NULL !=  m_localPool);   	// if that craps out, we'll try the local server-pool list
 				checkGlobal = (NULL != m_globalPool);		//if that craps out, we'll try the global server-pool list
-				#ifdef CLOCK_DEBUG
+        #ifdef CLOCK_DEEP_DEBUG
+          if (CC3KPrinter != 0) 
+          { 
+            CC3KPrinter->print(F("m_localPool: ")); CC3KPrinter->print(*m_localPool); CC3KPrinter->print(F("checkLocal: ")); CC3KPrinter->println(checkLocal);
+            CC3KPrinter->print(F("m_globalPool: ")); CC3KPrinter->print(*m_globalPool); CC3KPrinter->print(F("checkGlobal: ")); CC3KPrinter->println(checkGlobal);
+          }
+        #endif
+        #ifdef CLOCK_DEBUG
 					if (CC3KPrinter != 0) { CC3KPrinter->print(F("try user's ntp server list: ")); CC3KPrinter->println((uint32_t)*ntp_pool_list); }
 				#endif
 
