@@ -108,6 +108,18 @@ uint8_t ccspi_mySPICTRL, ccspi_oldSPICTRL;
 #define SpiConfigPop()			do {  } while (0)
 #endif
 
+#ifdef SPI_HAS_TRANSACTION
+// CC3000 SPI config + begin SPI usage + chip select
+#define CC3000_ASSERT_CS {     \
+  SpiConfigPush();             \
+  SPI.beginTransaction(SPISettings(16000000, MSBFIRST, SPI_MODE1)); \
+  digitalWrite(g_csPin, LOW); }
+// CC3000 chip deselect + end SPI usage + SPI restore
+#define CC3000_DEASSERT_CS {   \
+  digitalWrite(g_csPin, HIGH); \
+  SPI.endTransaction();        \
+  SpiConfigPop(); }
+#else
 // CC3000 chip select + SPI config
 #define CC3000_ASSERT_CS {     \
   digitalWrite(g_csPin, LOW);  \
@@ -116,6 +128,7 @@ uint8_t ccspi_mySPICTRL, ccspi_oldSPICTRL;
 #define CC3000_DEASSERT_CS {   \
   digitalWrite(g_csPin, HIGH); \
   SpiConfigPop(); }
+#endif
 
 
 /* smartconfig flags (defined in Adafruit_CC3000.cpp) */
@@ -256,7 +269,13 @@ int init_spi(void)
   // Newly-initialized SPI is in the same state that ASSERT_CS will set it
   // to.  Invoke DEASSERT (which also restores SPI registers) so the next
   // ASSERT call won't clobber the ccspi_old* values -- we need those!
+#ifdef SPI_HAS_TRANSACTION
+  SPI.usingInterrupt(g_IRQnum);
+  digitalWrite(g_csPin, HIGH);  // same as CC3000_DEASSERT_CS, but not
+  SpiConfigPop();               // SPI.endTransaction, because none began
+#else
   CC3000_DEASSERT_CS;
+#endif
 
   /* ToDo: Configure IRQ interrupt! */
 
@@ -365,6 +384,9 @@ long SpiWrite(unsigned char *pUserBuffer, unsigned short usLength)
       sSpiInformation.ulSpiState = eSPI_STATE_IDLE;
 
       CC3000_DEASSERT_CS;
+#ifdef SPI_HAS_TRANSACTION
+      WlanInterruptEnable();
+#endif
     }
   }
 
