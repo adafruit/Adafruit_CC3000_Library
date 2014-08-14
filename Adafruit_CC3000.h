@@ -2,18 +2,18 @@
 /*! 
   @file     Adafruit_CC3000.h
   @author   KTOWN (Kevin Townsend for Adafruit Industries)
-	@license  BSD (see license.txt)	
+  @license  BSD (see license.txt) 
 
-	This is a library for the Adafruit CC3000 WiFi breakout board
-	This library works with the Adafruit CC3000 breakout
-	----> https://www.adafruit.com/products/1469
-	
-	Check out the links above for our tutorials and wiring diagrams 
-	These chips use SPI to communicate.
+  This is a library for the Adafruit CC3000 WiFi breakout board
+  This library works with the Adafruit CC3000 breakout
+  ----> https://www.adafruit.com/products/1469
   
-	Adafruit invests time and resources providing this open source code, 
-	please support Adafruit and open-source hardware by purchasing 
-	products from Adafruit!	
+  Check out the links above for our tutorials and wiring diagrams 
+  These chips use SPI to communicate.
+  
+  Adafruit invests time and resources providing this open source code, 
+  please support Adafruit and open-source hardware by purchasing 
+  products from Adafruit! 
 */
 /**************************************************************************/
 
@@ -55,14 +55,14 @@
 
 typedef struct Result_Struct
 {
-	uint32_t	num_networks;
-	uint32_t 	scan_status;
-	uint8_t 	rssiByte;
-	uint8_t 	Sec_ssidLen;
-	uint16_t 	time;
-	uint8_t 	ssid_name[32];
-	uint8_t 	bssid[6];
-} ResultStruct_t;  	/**!ResultStruct_t : data struct to store SSID scan results */
+  uint32_t  num_networks;
+  uint32_t  scan_status;
+  uint8_t   rssiByte;
+  uint8_t   Sec_ssidLen;
+  uint16_t  time;
+  uint8_t   ssid_name[32];
+  uint8_t   bssid[6];
+} ResultStruct_t;   /**!ResultStruct_t : data struct to store SSID scan results */
 
 /* Enum for wlan_ioctl_statusget results */
 typedef enum 
