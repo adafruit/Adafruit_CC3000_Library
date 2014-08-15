@@ -71,6 +71,14 @@ class Adafruit_CC3000_Server : public Server {
 public:
   // Construct a TCP server to listen on the specified port.
   Adafruit_CC3000_Server(uint16_t port);
+  // Return the index of a client instance with data available to read.
+  // This is useful if you need to keep track of your own client state, you can
+  // index into an array of client state based on the available index returned
+  // from this function.  Optional boolean parameter returns by reference true
+  // if the available client is connecting for the first time.
+  int8_t availableIndex(bool *newClient = NULL);
+  // Get a client instance from a given index.
+  Adafruit_CC3000_ClientRef getClientRef(int8_t clientIndex);
   // Return a reference to a client instance which has data available to read.
   Adafruit_CC3000_ClientRef available();
   // Initialize the server and start listening for connections.
@@ -94,7 +102,7 @@ private:
   uint16_t _listenSocket;
 
   // Accept new connections and update the connected clients.
-  void acceptNewConnections();
+  bool acceptNewConnections();
 };
 
 #endif
