@@ -117,19 +117,41 @@ Adafruit_CC3000_Server::Adafruit_CC3000_Server(uint16_t port)
   , _listenSocket(-1)
 { }
 
-// Return a reference to a client instance which has data available to read.
-Adafruit_CC3000_ClientRef Adafruit_CC3000_Server::available() {
-  acceptNewConnections();
+// Return index of a client with data available for reading. Can be turned
+// into a client instance with getClientRef().  Accepts an optional parameter
+// to return a boolean (by reference) indicating if available client is connecting
+// for the first time.
+int8_t Adafruit_CC3000_Server::availableIndex(bool *newClient) {
+  bool newClientCreated = acceptNewConnections();
+
+  if (newClient)
+    *newClient = newClientCreated;
+
   // Find the first client which is ready to read and return it.
   for (int i = 0; i < MAX_SERVER_CLIENTS; ++i) {
     if (_clients[i].connected() && _clients[i].available() > 0) {
-      return Adafruit_CC3000_ClientRef(&_clients[i]);
+      return i;
     }
   }
+
+  return -1;
+}
+
+// Given the index of client, returns the instance of that client for reading/writing
+Adafruit_CC3000_ClientRef Adafruit_CC3000_Server::getClientRef(int8_t clientIndex) {
+  if (clientIndex != -1) {
+    return Adafruit_CC3000_ClientRef(&_clients[clientIndex]);
+  }
+  
   // Couldn't find a client ready to read, so return a client that is not 
   // connected to signal no clients are available for reading (convention
   // used by the Ethernet library).
   return Adafruit_CC3000_ClientRef(NULL);
+}
+
+// Return a reference to a client instance which has data available to read.
+Adafruit_CC3000_ClientRef Adafruit_CC3000_Server::available() {
+  return getClientRef(availableIndex(NULL));
 }
 
 // Initialize the server and start listening for connections.
@@ -201,7 +223,8 @@ size_t Adafruit_CC3000_Server::write(uint8_t value) {
 }
 
 // Accept new connections and update the connected clients.
-void Adafruit_CC3000_Server::acceptNewConnections() {
+bool Adafruit_CC3000_Server::acceptNewConnections() {
+  bool newClientCreated = false;
   // For any unconnected client, see if new connections are pending and accept
   // them as a new client.
   for (int i = 0; i < MAX_SERVER_CLIENTS; ++i) {
@@ -214,8 +237,10 @@ void Adafruit_CC3000_Server::acceptNewConnections() {
       int soc = accept(_listenSocket, NULL, NULL);
       if (soc > -1) {
         _clients[i] = Adafruit_CC3000_Client(soc);
+        newClientCreated = true;
       }
       // else either there were no sockets to accept or an error occured.
     }
   }
+  return newClientCreated;
 }
