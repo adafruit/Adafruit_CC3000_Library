@@ -197,10 +197,13 @@ bool Adafruit_CC3000::scanSSIDs(uint32_t time)
 
 /**************************************************************************/
 /*!
-    @brief  Instantiates a new CC3000 class
+    @brief  Instantiates a new CC3000 class.
+            Note that by default this class will assume the first hardware 
+            serial should be used for debug output.  This behavior can be
+            changed by explicitly specifying a cc3kPrinter parameter.
 */
 /**************************************************************************/
-Adafruit_CC3000::Adafruit_CC3000(uint8_t csPin, uint8_t irqPin, uint8_t vbatPin, uint8_t SPIspeed)
+Adafruit_CC3000::Adafruit_CC3000(uint8_t csPin, uint8_t irqPin, uint8_t vbatPin, uint8_t SPIspeed, Print* cc3kPrinter)
 {
   _initialised = false;
   g_csPin = csPin;
@@ -211,12 +214,7 @@ Adafruit_CC3000::Adafruit_CC3000(uint8_t csPin, uint8_t irqPin, uint8_t vbatPin,
 
   cc3000Bitset.clear();
 
-  #if defined(UDR0) || defined(UDR1) || defined(CORE_TEENSY) || ( defined (__arm__) && defined (__SAM3X8E__) )
-  CC3KPrinter = &Serial;
-  #else
-  CC3KPrinter = 0;
-  // no default serial port found
-  #endif
+  CC3KPrinter = cc3kPrinter;
 }
 
 /* *********************************************************************** */

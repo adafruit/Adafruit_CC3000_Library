@@ -45,6 +45,12 @@
 #define CHECK_PRINTER if(false)
 #endif
 
+#if defined(UDR0) || defined(UDR1) || defined(CORE_TEENSY) || ( defined (__arm__) && defined (__SAM3X8E__) )
+  #define CC3K_DEFAULT_PRINTER &Serial
+#else
+  #define CC3K_DEFAULT_PRINTER 0
+#endif
+
 #define WLAN_CONNECT_TIMEOUT 10000  // how long to wait, in milliseconds
 #define RXBUFFERSIZE  64 // how much to buffer on the incoming side
 #define TXBUFFERSIZE  32 // how much to buffer on the outgoing side
@@ -117,7 +123,7 @@ class Adafruit_CC3000_Client : public Print {
 
 class Adafruit_CC3000 {
   public:
-  Adafruit_CC3000(uint8_t csPin, uint8_t irqPin, uint8_t vbatPin, uint8_t spispeed = SPI_CLOCK_DIVIDER);
+    Adafruit_CC3000(uint8_t csPin, uint8_t irqPin, uint8_t vbatPin, uint8_t spispeed = SPI_CLOCK_DIVIDER, Print* cc3kPrinter = CC3K_DEFAULT_PRINTER);
     bool     begin(uint8_t patchReq = 0, bool useSmartConfigData = false, const char *_deviceName = NULL);
     void     reboot(uint8_t patchReq = 0);
     void     stop(void);
