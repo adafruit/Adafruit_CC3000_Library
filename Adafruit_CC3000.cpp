@@ -1392,7 +1392,7 @@ void Adafruit_CC3000_Client::operator=(const Adafruit_CC3000_Client& other) {
 
 Adafruit_CC3000_Client::operator bool()
 {
-  return true;
+  return connected();
 }
 
 int Adafruit_CC3000_Client::connect(const char *host, uint16_t port){
@@ -1635,7 +1635,7 @@ int Adafruit_CC3000_Client::available(void) {
 }
 
 void Adafruit_CC3000_Client::flush(){
-  
+  // No flush implementation, unclear if necessary.
 }
 
 int Adafruit_CC3000_Client::peek(){
