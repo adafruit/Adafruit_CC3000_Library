@@ -39,7 +39,17 @@ Adafruit_CC3000_ClientRef::operator bool() {
 // Below are wrappers around the public client functions.  These hide the fact that users
 // are dealing with a reference to a client instance and allow code to be written using
 // value semantics like in the Ethernet library.
-bool Adafruit_CC3000_ClientRef::connected(void) {
+int Adafruit_CC3000_ClientRef::connect(IPAddress ip, uint16_t port) {
+  HANDLE_NULL(_client, false);
+  return _client->connect(ip, port);
+}
+
+int Adafruit_CC3000_ClientRef::connect(const char *host, uint16_t port) {
+  HANDLE_NULL(_client, false);
+  return _client->connect(host, port);
+}
+
+uint8_t Adafruit_CC3000_ClientRef::connected(void) {
   HANDLE_NULL(_client, false);
   return _client->connected();
 }
@@ -79,17 +89,17 @@ size_t Adafruit_CC3000_ClientRef::fastrprintln(const __FlashStringHelper *ifsh) 
   return _client->fastrprintln(ifsh);
 }
 
-int16_t Adafruit_CC3000_ClientRef::write(const void *buf, uint16_t len, uint32_t flags) {
+size_t Adafruit_CC3000_ClientRef::write(const void *buf, uint16_t len, uint32_t flags) {
   HANDLE_NULL(_client, 0);
   return _client->write(buf, len, flags);
 }
 
-int16_t Adafruit_CC3000_ClientRef::read(void *buf, uint16_t len, uint32_t flags) {
+int Adafruit_CC3000_ClientRef::read(void *buf, uint16_t len, uint32_t flags) {
   HANDLE_NULL(_client, 0);
   return _client->read(buf, len, flags);
 }
 
-uint8_t Adafruit_CC3000_ClientRef::read(void) {
+int Adafruit_CC3000_ClientRef::read(void) {
   HANDLE_NULL(_client, 0);
   return _client->read();
 }
@@ -99,9 +109,32 @@ int32_t Adafruit_CC3000_ClientRef::close(void) {
   return _client->close();
 }
 
-uint8_t Adafruit_CC3000_ClientRef::available(void) {
+int Adafruit_CC3000_ClientRef::available(void) {
   HANDLE_NULL(_client, 0);
   return _client->available();
+}
+
+int Adafruit_CC3000_ClientRef::read(uint8_t *buf, size_t size) {
+  HANDLE_NULL(_client, 0);
+  return _client->read(buf, size);
+}
+
+size_t Adafruit_CC3000_ClientRef::write(const uint8_t *buf, size_t size) {
+  HANDLE_NULL(_client, 0);
+  return _client->write(buf, size);
+}
+
+int Adafruit_CC3000_ClientRef::peek() {
+  HANDLE_NULL(_client, 0);
+  return _client->peek();
+}
+
+void Adafruit_CC3000_ClientRef::flush() {
+  if (_client != NULL) _client->flush();
+}
+
+void Adafruit_CC3000_ClientRef::stop() {
+  if (_client != NULL) _client->stop();
 }
 
 

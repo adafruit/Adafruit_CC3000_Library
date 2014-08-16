@@ -1300,7 +1300,7 @@ Adafruit_CC3000_Client Adafruit_CC3000::connectTCP(uint32_t destIP, uint16_t des
 
   //printHex((byte *)&socketAddress, sizeof(socketAddress));
   //if (CC3KPrinter != 0) CC3KPrinter->print(F("Connecting socket ... "));
-  if (-1 == connect(tcp_socket, &socketAddress, sizeof(socketAddress)))
+  if (-1 == ::connect(tcp_socket, &socketAddress, sizeof(socketAddress)))
   {
     CHECK_PRINTER {
       CC3KPrinter->println(F("Connection error"));
@@ -1350,7 +1350,7 @@ Adafruit_CC3000_Client Adafruit_CC3000::connectUDP(uint32_t destIP, uint16_t des
   }
 
   //printHex((byte *)&socketAddress, sizeof(socketAddress));
-  if (-1 == connect(udp_socket, &socketAddress, sizeof(socketAddress)))
+  if (-1 == ::connect(udp_socket, &socketAddress, sizeof(socketAddress)))
   {
     CHECK_PRINTER {
       CC3KPrinter->println(F("Connection error"));
@@ -1390,7 +1390,80 @@ void Adafruit_CC3000_Client::operator=(const Adafruit_CC3000_Client& other) {
   memcpy(_rx_buf, other._rx_buf, RXBUFFERSIZE);
 }
 
-bool Adafruit_CC3000_Client::connected(void) { 
+Adafruit_CC3000_Client::operator bool()
+{
+  return connected();
+}
+
+int Adafruit_CC3000_Client::connect(const char *host, uint16_t port){
+  
+  // if (!_initialised) return 0;
+  // if (!ulCC3000Connected) return 0;
+  // if (!ulCC3000DHCP) return 0;
+
+  uint32_t ip = 0;
+
+  int16_t r = gethostbyname(host, strlen(host), &ip);
+
+  if (ip!=0 && r!=0)
+    return connect(ip, port);
+  else 
+    return 0;
+}
+
+int Adafruit_CC3000_Client::connect(IPAddress destIP, uint16_t destPort)
+{
+  bufsiz = 0;
+  _rx_buf_idx = 0;
+  sockaddr      socketAddress;
+  int32_t       tcp_socket;
+
+  // Create the socket(s)
+  //if (CC3KPrinter != 0) CC3KPrinter->print(F("Creating socket ... "));
+  tcp_socket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+  if (-1 == tcp_socket)
+  {
+    CHECK_PRINTER {
+      CC3KPrinter->println(F("Failed to open socket"));
+    }
+    return 0;
+  }
+  //CC3KPrinter->print(F("DONE (socket ")); CC3KPrinter->print(tcp_socket); CC3KPrinter->println(F(")"));
+
+  // Try to open the socket
+  memset(&socketAddress, 0x00, sizeof(socketAddress));
+  socketAddress.sa_family = AF_INET;
+  socketAddress.sa_data[0] = (destPort & 0xFF00) >> 8;  // Set the Port Number
+  socketAddress.sa_data[1] = (destPort & 0x00FF);
+  socketAddress.sa_data[2] = destIP >> 24;
+  socketAddress.sa_data[3] = destIP >> 16;
+  socketAddress.sa_data[4] = destIP >> 8;
+  socketAddress.sa_data[5] = destIP;
+
+  CHECK_PRINTER {
+    CC3KPrinter->print(F("\n\rConnect to "));
+    CC3KPrinter->print(destIP);
+    CC3KPrinter->print(':');
+    CC3KPrinter->println(destPort);
+  }
+
+  //printHex((byte *)&socketAddress, sizeof(socketAddress));
+  //if (CC3KPrinter != 0) CC3KPrinter->print(F("Connecting socket ... "));
+  if (-1 == ::connect(tcp_socket, &socketAddress, sizeof(socketAddress)))
+  {
+    CHECK_PRINTER {
+      CC3KPrinter->println(F("Connection error"));
+    }
+    closesocket(tcp_socket);
+    return 0;
+  }
+  // if (CC3KPrinter != 0) CC3KPrinter->println(F("DONE"));
+
+  _socket = tcp_socket;
+  return 1;
+}
+
+uint8_t Adafruit_CC3000_Client::connected(void) { 
   if (_socket < 0) return false;
 
   if (! available() && closed_sockets[_socket] == true) {
@@ -1404,11 +1477,15 @@ bool Adafruit_CC3000_Client::connected(void) {
   else return true;  
 }
 
-int16_t Adafruit_CC3000_Client::write(const void *buf, uint16_t len, uint32_t flags)
+size_t Adafruit_CC3000_Client::write(const void *buf, uint16_t len, uint32_t flags)
 {
   return send(_socket, buf, len, flags);
 }
 
+size_t Adafruit_CC3000_Client::write(const uint8_t *buf, size_t len)
+{
+  return write(buf, len, 0);
+}
 
 size_t Adafruit_CC3000_Client::write(uint8_t c)
 {
@@ -1492,10 +1569,15 @@ size_t Adafruit_CC3000_Client::fastrprintln(char *str) {
   return r;
 }
 
-int16_t Adafruit_CC3000_Client::read(void *buf, uint16_t len, uint32_t flags) 
+int Adafruit_CC3000_Client::read(void *buf, uint16_t len, uint32_t flags) 
 {
   return recv(_socket, buf, len, flags);
 
+}
+
+int Adafruit_CC3000_Client::read(uint8_t *buf, size_t len) 
+{
+  return read(buf, len, 0);
 }
 
 int32_t Adafruit_CC3000_Client::close(void) {
@@ -1504,7 +1586,11 @@ int32_t Adafruit_CC3000_Client::close(void) {
   return x;
 }
 
-uint8_t Adafruit_CC3000_Client::read(void) 
+void Adafruit_CC3000_Client::stop(){
+  close();
+}
+
+int Adafruit_CC3000_Client::read(void) 
 {
   while ((bufsiz <= 0) || (bufsiz == _rx_buf_idx)) {
     cc3k_int_poll();
@@ -1523,7 +1609,7 @@ uint8_t Adafruit_CC3000_Client::read(void)
   return ret;
 }
 
-uint8_t Adafruit_CC3000_Client::available(void) {
+int Adafruit_CC3000_Client::available(void) {
   // not open!
   if (_socket < 0) return 0;
 
@@ -1546,6 +1632,28 @@ uint8_t Adafruit_CC3000_Client::available(void) {
   //if (CC3KPrinter != 0) } CC3KPrinter->print(F("Select: ")); CC3KPrinter->println(s); }
   if (s == 1) return 1;  // some data is available to read
   else return 0;  // no data is available
+}
+
+void Adafruit_CC3000_Client::flush(){
+  // No flush implementation, unclear if necessary.
+}
+
+int Adafruit_CC3000_Client::peek(){
+  while ((bufsiz <= 0) || (bufsiz == _rx_buf_idx)) {
+    cc3k_int_poll();
+    // buffer in some more data
+    bufsiz = recv(_socket, _rx_buf, sizeof(_rx_buf), 0);
+    if (bufsiz == -57) {
+      close();
+      return 0;
+    }
+    //if (CC3KPrinter != 0) { CC3KPrinter->println("Read "); CC3KPrinter->print(bufsiz); CC3KPrinter->println(" bytes"); }
+    _rx_buf_idx = 0;
+  }
+  uint8_t ret = _rx_buf[_rx_buf_idx];
+
+  //if (CC3KPrinter != 0) { CC3KPrinter->print("("); CC3KPrinter->write(ret); CC3KPrinter->print(")"); }
+  return ret;
 }
 
 void Adafruit_CC3000::setPrinter(Print* p) {

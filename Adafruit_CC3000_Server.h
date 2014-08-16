@@ -24,7 +24,7 @@
 
 #include "Adafruit_CC3000.h"
 
-#include "Print.h"
+#include "Client.h"
 #include "Server.h"
 
 // Assume 4 sockets available, 1 of which is used for listening, so at most 3 
@@ -35,14 +35,17 @@
 // and acts like a client instance value.  This is done to mimic the semantics 
 // of the Ethernet library, without running into problems allowing client buffers
 // to be copied and get out of sync.
-class Adafruit_CC3000_ClientRef : public Print {
+class Adafruit_CC3000_ClientRef : public Client {
  public:
   Adafruit_CC3000_ClientRef(Adafruit_CC3000_Client* client);
   // Return true if the referenced client is connected.  This is provided for
   // compatibility with Ethernet library code.
   operator bool();
   // Below are all the public methods of the client class:
-  bool connected(void);
+  int connect(IPAddress ip, uint16_t port);
+  int connect(const char *host, uint16_t port);
+
+  uint8_t connected(void);
   size_t write(uint8_t c);
 
   size_t fastrprint(const char *str);
@@ -52,11 +55,17 @@ class Adafruit_CC3000_ClientRef : public Print {
   size_t fastrprint(const __FlashStringHelper *ifsh);
   size_t fastrprintln(const __FlashStringHelper *ifsh);
 
-  int16_t write(const void *buf, uint16_t len, uint32_t flags = 0);
-  int16_t read(void *buf, uint16_t len, uint32_t flags = 0);
-  uint8_t read(void);
+  size_t write(const void *buf, uint16_t len, uint32_t flags = 0);
+  int read(void *buf, uint16_t len, uint32_t flags = 0);
+  int read(void);
   int32_t close(void);
-  uint8_t available(void);
+  int available(void);
+
+  int read(uint8_t *buf, size_t size);
+  size_t write(const uint8_t *buf, size_t size);
+  int peek();
+  void flush();
+  void stop();
 
  private:
   // Hide the fact that users are really dealing with a pointer to a client
