@@ -99,7 +99,7 @@ Adafruit_CC3000 cc3000 = Adafruit_CC3000(ADAFRUIT_CC3000_CS, ADAFRUIT_CC3000_IRQ
 
 Adafruit_CC3000_Server httpServer(LISTEN_PORT);
 uint8_t buffer[BUFFER_SIZE+1];
-int index = 0;
+int bufindex = 0;
 char action[MAX_ACTION+1];
 char path[MAX_PATH+1];
 
@@ -162,7 +162,7 @@ void loop(void)
     // Note that this is explicitly limited to handling one request at a time!
 
     // Clear the incoming data buffer and point to the beginning of it.
-    index = 0;
+    bufindex = 0;
     memset(&buffer, 0, sizeof(buffer));
     
     // Clear action and path strings.
@@ -174,11 +174,11 @@ void loop(void)
     
     // Read all the incoming data until it can be parsed or the timeout expires.
     bool parsed = false;
-    while (!parsed && (millis() < endtime) && (index < BUFFER_SIZE)) {
+    while (!parsed && (millis() < endtime) && (bufindex < BUFFER_SIZE)) {
       if (client.available()) {
-        buffer[index++] = client.read();
+        buffer[bufindex++] = client.read();
       }
-      parsed = parseRequest(buffer, index, action, path);
+      parsed = parseRequest(buffer, bufindex, action, path);
     }
 
     // Handle the request if it was parsed.
