@@ -44,6 +44,7 @@
 #define	__NETAPP_H__
 
 #include <Arduino.h>
+#include "data_types.h"
 
 //*****************************************************************************
 //
@@ -64,33 +65,33 @@ extern "C" {
 
 typedef struct _netapp_dhcp_ret_args_t
 {
-    unsigned char aucIP[4];
-	unsigned char aucSubnetMask[4];
-	unsigned char aucDefaultGateway[4];
-	unsigned char aucDHCPServer[4];
-	unsigned char aucDNSServer[4];
+    UINT8 aucIP[4];
+	UINT8 aucSubnetMask[4];
+	UINT8 aucDefaultGateway[4];
+	UINT8 aucDHCPServer[4];
+	UINT8 aucDNSServer[4];
 }tNetappDhcpParams;
 
 typedef struct _netapp_ipconfig_ret_args_t
 {
-    unsigned char aucIP[4];
-	unsigned char aucSubnetMask[4];
-	unsigned char aucDefaultGateway[4];
-	unsigned char aucDHCPServer[4];
-	unsigned char aucDNSServer[4];
-	unsigned char uaMacAddr[6];
-	unsigned char uaSSID[32];
+    UINT8 aucIP[4];
+	UINT8 aucSubnetMask[4];
+	UINT8 aucDefaultGateway[4];
+	UINT8 aucDHCPServer[4];
+	UINT8 aucDNSServer[4];
+	UINT8 uaMacAddr[6];
+	UINT8 uaSSID[32];
 }tNetappIpconfigRetArgs;
 
 
 /*Ping send report parameters*/
 typedef struct _netapp_pingreport_args
 {
-	unsigned long packets_sent;
-	unsigned long packets_received;
-	unsigned long min_round_time;
-	unsigned long max_round_time;
-	unsigned long avg_round_time;
+	UINT32 packets_sent;
+	UINT32 packets_received;
+	UINT32 min_round_time;
+	UINT32 max_round_time;
+	UINT32 avg_round_time;
 } netapp_pingreport_args_t;
 
 
@@ -108,7 +109,7 @@ typedef struct _netapp_pingreport_args
 //!                over resets.
 //
 //*****************************************************************************
-extern long  netapp_config_mac_adrress( unsigned char *mac );
+extern INT32  netapp_config_mac_adrress( UINT8 *mac );
 
 //*****************************************************************************
 //
@@ -136,7 +137,7 @@ extern long  netapp_config_mac_adrress( unsigned char *mac );
 //!               AP was established. 
 //!
 //*****************************************************************************
-extern 	long netapp_dhcp(unsigned long *aucIP, unsigned long *aucSubnetMask,unsigned long *aucDefaultGateway, unsigned long *aucDNSServer);
+extern 	INT32 netapp_dhcp(UINT32 *aucIP, UINT32 *aucSubnetMask,UINT32 *aucDefaultGateway, UINT32 *aucDNSServer);
 
 
 
@@ -190,7 +191,7 @@ extern 	long netapp_dhcp(unsigned long *aucIP, unsigned long *aucSubnetMask,unsi
 //!
 //*****************************************************************************
  #ifndef CC3000_TINY_DRIVER
-extern long netapp_timeout_values(unsigned long *aucDHCP, unsigned long *aucARP,unsigned long *aucKeepalive,	unsigned long *aucInactivity);
+extern INT32 netapp_timeout_values(UINT32 *aucDHCP, UINT32 *aucARP,UINT32 *aucKeepalive,	UINT32 *aucInactivity);
 #endif
 
 //*****************************************************************************
@@ -215,7 +216,7 @@ extern long netapp_timeout_values(unsigned long *aucDHCP, unsigned long *aucARP,
 //*****************************************************************************
 
  #ifndef CC3000_TINY_DRIVER
-extern long netapp_ping_send(uint32_t *ip, uint32_t ulPingAttempts, uint32_t ulPingSize, uint32_t ulPingTimeout);
+extern INT32 netapp_ping_send(UINT32 *ip, UINT32 ulPingAttempts, UINT32 ulPingSize, UINT32 ulPingTimeout);
 #endif
 
 //*****************************************************************************
@@ -232,7 +233,7 @@ extern long netapp_ping_send(uint32_t *ip, uint32_t ulPingAttempts, uint32_t ulP
 //*****************************************************************************
 
 #ifndef CC3000_TINY_DRIVER
-extern long netapp_ping_stop();
+extern INT32 netapp_ping_stop();
 #endif
 //*****************************************************************************
 //
@@ -303,7 +304,7 @@ extern void netapp_ipconfig( tNetappIpconfigRetArgs * ipconfig );
 //*****************************************************************************
 
 #ifndef CC3000_TINY_DRIVER
-extern long netapp_arp_flush();
+extern INT32 netapp_arp_flush();
 #endif
 
 
@@ -327,7 +328,7 @@ extern long netapp_arp_flush();
 
 
 #ifndef CC3000_TINY_DRIVER
-long netapp_set_debug_level(unsigned long ulLevel);
+INT32 netapp_set_debug_level(UINT32 ulLevel);
 #endif
 //*****************************************************************************
 //

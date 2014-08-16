@@ -47,7 +47,7 @@
 #include "evnt_handler.h"
 #include "nvmem.h"
 
-#define MIN_TIMER_VAL_SECONDS      20
+#define MIN_TIMER_VAL_SECONDS      10
 #define MIN_TIMER_SET(t)    if ((0 != t) && (t < MIN_TIMER_VAL_SECONDS)) \
                             { \
                                 t = MIN_TIMER_VAL_SECONDS; \
@@ -74,7 +74,7 @@
 //!                over resets.
 //
 //*****************************************************************************
-long netapp_config_mac_adrress(unsigned char * mac)
+INT32 netapp_config_mac_adrress(UINT8 * mac)
 {
 	return  nvmem_set_mac_address(mac);
 }
@@ -105,11 +105,11 @@ long netapp_config_mac_adrress(unsigned char * mac)
 //!               AP was established. 
 //!
 //*****************************************************************************
-long netapp_dhcp(unsigned long *aucIP, unsigned long *aucSubnetMask,unsigned long *aucDefaultGateway, unsigned long *aucDNSServer)
+INT32 netapp_dhcp(UINT32 *aucIP, UINT32 *aucSubnetMask,UINT32 *aucDefaultGateway, UINT32 *aucDNSServer)
 {
-	signed char scRet;
-	unsigned char *ptr;
-	unsigned char *args;
+	INT8 scRet;
+	UINT8 *ptr;
+	UINT8 *args;
 	
 	scRet = EFAIL;
 	ptr = tSLInformation.pucTxCommandBuffer;
@@ -183,12 +183,11 @@ long netapp_dhcp(unsigned long *aucIP, unsigned long *aucSubnetMask,unsigned lon
 //*****************************************************************************
 
 #ifndef CC3000_TINY_DRIVER
-long 
-netapp_timeout_values(unsigned long *aucDHCP, unsigned long *aucARP,unsigned long *aucKeepalive,	unsigned long *aucInactivity)
+INT32 netapp_timeout_values(UINT32 *aucDHCP, UINT32 *aucARP,UINT32 *aucKeepalive,	UINT32 *aucInactivity)
 {
-	signed char scRet;
-	unsigned char *ptr;
-	unsigned char *args;
+	INT8 scRet;
+	UINT8 *ptr;
+	UINT8 *args;
 	
 	scRet = EFAIL;
 	ptr = tSLInformation.pucTxCommandBuffer;
@@ -239,11 +238,11 @@ netapp_timeout_values(unsigned long *aucDHCP, unsigned long *aucARP,unsigned lon
 //*****************************************************************************
 
 #ifndef CC3000_TINY_DRIVER
-long
-netapp_ping_send(uint32_t *ip, uint32_t ulPingAttempts, uint32_t ulPingSize, uint32_t ulPingTimeout)
+INT32 
+netapp_ping_send(UINT32 *ip, UINT32 ulPingAttempts, UINT32 ulPingSize, UINT32 ulPingTimeout)
 {
-	signed char scRet;
-	unsigned char *ptr, *args;
+	INT8 scRet;
+	UINT8 *ptr, *args;
 	
 	scRet = EFAIL;
 	ptr = tSLInformation.pucTxCommandBuffer;
@@ -301,9 +300,9 @@ netapp_ping_send(uint32_t *ip, uint32_t ulPingAttempts, uint32_t ulPingSize, uin
 #ifndef CC3000_TINY_DRIVER
 void netapp_ping_report()
 {
-	unsigned char *ptr;
+	UINT8 *ptr;
 	ptr = tSLInformation.pucTxCommandBuffer;
-	signed char scRet;
+	INT8 scRet;
 	
 	scRet = EFAIL;
 	
@@ -329,10 +328,10 @@ void netapp_ping_report()
 //*****************************************************************************
 
 #ifndef CC3000_TINY_DRIVER
-long netapp_ping_stop()
+INT32 netapp_ping_stop()
 {
-	signed char scRet;
-	unsigned char *ptr;
+	INT8 scRet;
+	UINT8 *ptr;
 	
 	scRet = EFAIL;
 	ptr = tSLInformation.pucTxCommandBuffer;
@@ -376,7 +375,7 @@ long netapp_ping_stop()
 #ifndef CC3000_TINY_DRIVER
 void netapp_ipconfig( tNetappIpconfigRetArgs * ipconfig )
 {
-	unsigned char *ptr;
+	UINT8 *ptr;
 	
 	ptr = tSLInformation.pucTxCommandBuffer;
 	
@@ -407,10 +406,10 @@ void netapp_ipconfig( tNetappIpconfigRetArgs * ipconfig )
 //*****************************************************************************
 
 #ifndef CC3000_TINY_DRIVER
-long netapp_arp_flush(void)
+INT32 netapp_arp_flush(void)
 {
-	signed char scRet;
-	unsigned char *ptr;
+	INT8 scRet;
+	UINT8 *ptr;
 	
 	scRet = EFAIL;
 	ptr = tSLInformation.pucTxCommandBuffer;
@@ -445,10 +444,10 @@ long netapp_arp_flush(void)
 
 
 #ifndef CC3000_TINY_DRIVER
-long netapp_set_debug_level(unsigned long ulLevel)
+INT32 netapp_set_debug_level(UINT32 ulLevel)
 {
-	signed char scRet;
-    unsigned char *ptr, *args;
+	INT8 scRet;
+    UINT8 *ptr, *args;
 
     scRet = EFAIL;
     ptr = tSLInformation.pucTxCommandBuffer;
