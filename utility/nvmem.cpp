@@ -88,7 +88,7 @@
 //!  @param  ulOffset    ulOffset in file from where to read  
 //!  @param  buff        output buffer pointer
 //!
-//!  @return       number of bytes read, otherwise error.
+//!  @return       on success 0, error otherwise.
 //!
 //!  @brief       Reads data from the file referred by the ulFileId parameter. 
 //!               Reads data from file ulOffset till length. Err if the file can't
@@ -96,12 +96,11 @@
 //!	 
 //*****************************************************************************
 
-signed long 
-nvmem_read(unsigned long ulFileId, unsigned long ulLength, unsigned long ulOffset, unsigned char *buff)
+INT32 nvmem_read(UINT32 ulFileId, UINT32 ulLength, UINT32 ulOffset, UINT8 *buff)
 {
-	unsigned char ucStatus = 0xFF;
-	unsigned char *ptr;
-	unsigned char *args;
+	UINT8 ucStatus = 0xFF;
+	UINT8 *ptr;
+	UINT8 *args;
 	
 	ptr = tSLInformation.pucTxCommandBuffer;
 	args = (ptr + HEADERS_SIZE_CMD);
@@ -148,13 +147,11 @@ nvmem_read(unsigned long ulFileId, unsigned long ulLength, unsigned long ulOffse
 //!	 
 //*****************************************************************************
 
-signed long 
-nvmem_write(unsigned long ulFileId, unsigned long ulLength, unsigned long 
-						ulEntryOffset, unsigned char *buff)
+INT32 nvmem_write(UINT32 ulFileId, UINT32 ulLength, UINT32 ulEntryOffset, UINT8 *buff)
 {
-	long iRes;
-	unsigned char *ptr;
-	unsigned char *args;
+	INT32 iRes;
+	UINT8 *ptr;
+	UINT8 *args;
 	
 	iRes = EFAIL;
 	
@@ -171,7 +168,7 @@ nvmem_write(unsigned long ulFileId, unsigned long ulLength, unsigned long
 					NVMEM_WRITE_PARAMS_LEN),buff,ulLength);
 #if (DEBUG_MODE == 1)
 	PRINT_F("Writing:\t");
-	for (uint8_t i=0; i<ulLength; i++) {
+	for (UINT8 i=0; i<ulLength; i++) {
 	    PRINT_F("0x");
 	    printHex(buff[i]);
 	    PRINT_F(", ");
@@ -201,7 +198,7 @@ nvmem_write(unsigned long ulFileId, unsigned long ulLength, unsigned long
 //!	 
 //*****************************************************************************
 
-unsigned char nvmem_set_mac_address(unsigned char *mac)
+UINT8 nvmem_set_mac_address(UINT8 *mac)
 {
 	return  nvmem_write(NVMEM_MAC_FILEID, MAC_ADDR_LEN, 0, mac);
 }
@@ -219,7 +216,7 @@ unsigned char nvmem_set_mac_address(unsigned char *mac)
 //!	 
 //*****************************************************************************
 
-unsigned char nvmem_get_mac_address(unsigned char *mac)
+UINT8 nvmem_get_mac_address(UINT8 *mac)
 {
 	return  nvmem_read(NVMEM_MAC_FILEID, MAC_ADDR_LEN, 0, mac);
 }
@@ -242,21 +239,21 @@ unsigned char nvmem_get_mac_address(unsigned char *mac)
 //!	 
 //*****************************************************************************
 
-unsigned char nvmem_write_patch(unsigned long ulFileId, unsigned long spLength, const uint8_t *spData)
+UINT8 nvmem_write_patch(UINT32 ulFileId, UINT32 spLength, const UINT8 *spData)
 {
-	unsigned char 	status = 0;
-	unsigned short	offset = 0;
-	unsigned char*      spDataPtr = (unsigned char*)spData;
-	uint8_t rambuffer[SP_PORTION_SIZE];
+	UINT8 	status = 0;
+	UINT16	offset = 0;
+	UINT8*      spDataPtr = (UINT8*)spData;
+	UINT8 rambuffer[SP_PORTION_SIZE];
 
 	while ((status == 0) && (spLength >= SP_PORTION_SIZE))
 	{
-	  for (uint8_t i=0; i<SP_PORTION_SIZE; i++) {
+	  for (UINT8 i=0; i<SP_PORTION_SIZE; i++) {
 	    rambuffer[i] = pgm_read_byte(spData + i + offset);
 	  }
 #if (DEBUG_MODE == 1)
 	  PRINT_F("Writing: "); printDec16(offset); PRINT_F("\t");
-	  for (uint8_t i=0; i<SP_PORTION_SIZE; i++) {
+	  for (UINT8 i=0; i<SP_PORTION_SIZE; i++) {
 	    PRINT_F("0x");
 	    printHex(rambuffer[i]);
 	    PRINT_F(", ");
@@ -300,11 +297,11 @@ unsigned char nvmem_write_patch(unsigned long ulFileId, unsigned long spLength, 
 //*****************************************************************************
 
 #ifndef CC3000_TINY_DRIVER
-uint8_t nvmem_read_sp_version(uint8_t* patchVer)
+UINT8 nvmem_read_sp_version(UINT8* patchVer)
 {
-	uint8_t *ptr;
+	UINT8 *ptr;
 	// 1st byte is the status and the rest is the SP version
-	uint8_t	retBuf[5];	
+	UINT8	retBuf[5];	
 	
 	ptr = tSLInformation.pucTxCommandBuffer;
   
@@ -344,12 +341,11 @@ uint8_t nvmem_read_sp_version(uint8_t* patchVer)
 //!	 
 //*****************************************************************************
 
-int8_t
-nvmem_create_entry(unsigned long ulFileId, unsigned long ulNewLen)
+INT32 nvmem_create_entry(UINT32 ulFileId, UINT32 ulNewLen)
 {
-	unsigned char *ptr; 
-	unsigned char *args;
-	int8_t retval;
+	UINT8 *ptr; 
+	UINT8 *args;
+	UINT8 retval;
 	
 	ptr = tSLInformation.pucTxCommandBuffer;
 	args = (ptr + HEADERS_SIZE_CMD);
@@ -362,6 +358,7 @@ nvmem_create_entry(unsigned long ulFileId, unsigned long ulNewLen)
 	hci_command_send(HCI_CMND_NVMEM_CREATE_ENTRY,ptr, NVMEM_CREATE_PARAMS_LEN);
 	
 	SimpleLinkWaitEvent(HCI_CMND_NVMEM_CREATE_ENTRY, &retval);
+
 	return(retval);
 }
 

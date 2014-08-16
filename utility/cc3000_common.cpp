@@ -70,8 +70,7 @@
 //!  @brief stub function for ASSERT macro
 //
 //*****************************************************************************
-void
-__error__(char *pcFilename, unsigned long ulLine)
+void __error__(CHAR *pcFilename, UINT32 ulLine)
 {
     //TODO full up function
 }
@@ -92,12 +91,12 @@ __error__(char *pcFilename, unsigned long ulLine)
 //
 //*****************************************************************************
 
-uint8_t* UINT32_TO_STREAM_f (uint8_t *p, uint32_t u32)
+UINT8* UINT32_TO_STREAM_f (UINT8 *p, UINT32 u32)
 {
-	*(p)++ = (uint8_t)(u32);
-	*(p)++ = (uint8_t)((u32) >> 8);
-	*(p)++ = (uint8_t)((u32) >> 16);
-	*(p)++ = (uint8_t)((u32) >> 24);
+	*(p)++ = (UINT8)(u32);
+	*(p)++ = (UINT8)((u32) >> 8);
+	*(p)++ = (UINT8)((u32) >> 16);
+	*(p)++ = (UINT8)((u32) >> 24);
 	return p;
 }
 
@@ -115,10 +114,10 @@ uint8_t* UINT32_TO_STREAM_f (uint8_t *p, uint32_t u32)
 //
 //*****************************************************************************
 
-uint8_t* UINT16_TO_STREAM_f (uint8_t *p, uint16_t u16)
+UINT8* UINT16_TO_STREAM_f (UINT8 *p, UINT16 u16)
 {
-	*(p)++ = (uint8_t)(u16);
-	*(p)++ = (uint8_t)((u16) >> 8);
+	*(p)++ = (UINT8)(u16);
+	*(p)++ = (UINT8)((u16) >> 8);
 	return p;
 }
 
@@ -136,9 +135,9 @@ uint8_t* UINT16_TO_STREAM_f (uint8_t *p, uint16_t u16)
 //
 //*****************************************************************************
 
-uint16_t STREAM_TO_UINT16_f(char* cp, uint16_t offset)
+UINT16 STREAM_TO_UINT16_f(CHAR* cp, UINT16 offset)
 {
-  uint8_t *p = (uint8_t *)cp;
+  UINT8 *p = (UINT8 *)cp;
   /*
   DEBUGPRINT_F("Stream2u16: ");
   DEBUGPRINT_HEX(cp[offset+1]);
@@ -147,9 +146,8 @@ uint16_t STREAM_TO_UINT16_f(char* cp, uint16_t offset)
   DEBUGPRINT_F("\n\r");
   */
 
-  return (uint16_t)((uint16_t)
-		    ((uint16_t)(*(p + offset + 1)) << 8) +
-		    (uint16_t)(*(p + offset)));
+  return (UINT16)((UINT16)((UINT16)
+          (*(p + offset + 1)) << 8) + (UINT16)(*(p + offset)));
 }
 
 //*****************************************************************************
@@ -166,9 +164,9 @@ uint16_t STREAM_TO_UINT16_f(char* cp, uint16_t offset)
 //
 //*****************************************************************************
 
-uint32_t STREAM_TO_UINT32_f(char * cp, uint16_t offset)
+UINT32 STREAM_TO_UINT32_f(CHAR* cp, UINT16 offset)
 {
-  uint8_t *p = (uint8_t *)cp;
+  UINT8 *p = (UINT8 *)cp;
   
   /*
   DEBUGPRINT_F("\tStream2u32: ");
@@ -179,10 +177,10 @@ uint32_t STREAM_TO_UINT32_f(char * cp, uint16_t offset)
   DEBUGPRINT_F("\n\r");
   */
 
-  return (uint32_t)((uint32_t)((uint32_t)
-	(*(p + offset + 3)) << 24) + (uint32_t)((uint32_t)
-	(*(p + offset + 2)) << 16) + (uint32_t)((uint32_t)
-	(*(p + offset + 1)) << 8) + (uint32_t)(*(p + offset)));
+  return (UINT32)((UINT32)((UINT32)
+	(*(p + offset + 3)) << 24) + (UINT32)((UINT32)
+	(*(p + offset + 2)) << 16) + (UINT32)((UINT32)
+	(*(p + offset + 1)) << 8) + (UINT32)(*(p + offset)));
 }
 
 
