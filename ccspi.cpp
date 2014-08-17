@@ -213,7 +213,7 @@ void SpiOpen(gcSpiHandleRx pfRxHandler)
   sSpiInformation.ulSpiState = eSPI_STATE_POWERUP;
 
   memset(spi_buffer, 0, sizeof(spi_buffer));
-  memset(wlan_tx_buffer, 0, sizeof(spi_buffer));
+  memset(wlan_tx_buffer, 0, sizeof(wlan_tx_buffer));
 
   sSpiInformation.SPIRxHandler      = pfRxHandler;
   sSpiInformation.usTxPacketLength  = 0;
