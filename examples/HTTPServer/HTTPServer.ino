@@ -36,12 +36,6 @@
   to the server IP from a web browser.  For example if your
   server is listening on IP 192.168.1.130 you would access
   http://192.168.1.130/ from your web browser.
-           
-  For example on Linux or Mac OSX, if your CC3000 has an
-  IP address 192.168.1.100 you would execute in a command
-  window:
-  
-    telnet 192.168.1.100 7
   
   Created by Tony DiCola and adapted from HTTP server code created by Eric Friedrich.
   
@@ -245,8 +239,8 @@ void parseFirstLine(char* line, char* action, char* path) {
   // Parse first word up to whitespace as action.
   char* lineaction = strtok(line, " ");
   if (lineaction != NULL)
-    strncpy(action, lineaction, MAX_PATH);
-  // Pasrse second word up to whitespace as path.
+    strncpy(action, lineaction, MAX_ACTION);
+  // Parse second word up to whitespace as path.
   char* linepath = strtok(NULL, " ");
   if (linepath != NULL)
     strncpy(path, linepath, MAX_PATH);
