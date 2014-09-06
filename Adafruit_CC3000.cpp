@@ -932,7 +932,6 @@ bool Adafruit_CC3000::startSmartConfig(const char *_deviceName, const char *smar
     Connect to an unsecured SSID/AP(security)
 
     @param  ssid      The named of the AP to connect to (max 32 chars)
-    @param  ssidLen   The size of the ssid name
 
     @returns  False if an error occured!
 */
@@ -952,7 +951,7 @@ bool Adafruit_CC3000::connectOpen(const char *ssid)
           0 ,NULL,0),
           "SSID connection failed", false);
   #else
-    wlan_connect(ssid, ssidLen);
+    wlan_connect(ssid, strlen(ssid));
   #endif
 
   return true;
