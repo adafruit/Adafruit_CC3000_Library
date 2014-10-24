@@ -1221,6 +1221,17 @@ bool Adafruit_CC3000::checkConnected(void)
 /**************************************************************************/
 bool Adafruit_CC3000::checkDHCP(void)
 {
+  // Ugly hack to fix UDP issues with the 1.13 firmware by calling
+  // gethostbyname on localhost.  The output is completely ignored
+  // but for some reason this call is necessary or else UDP won't 
+  // work.  See this thread from TI for more details and the genesis
+  // of the workaround: http://e2e.ti.com/support/wireless_connectivity/f/851/t/342177.aspx
+  // Putting this in checkDHCP is a nice way to make it just work
+  // for people without any need to add to their sketch.
+  if (cc3000Bitset.test(CC3000BitSet::HasDHCP)) {
+    uint32_t output;
+    gethostbyname("localhost", 9, &output);
+  }
   return cc3000Bitset.test(CC3000BitSet::HasDHCP);
 }
 
