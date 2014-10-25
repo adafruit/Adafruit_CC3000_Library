@@ -799,12 +799,12 @@ uint8_t Adafruit_CC3000::getNextSSID(uint8_t *rssi, uint8_t *secMode, char *ssid
 */
 /**************************************************************************/
 #ifndef CC3000_TINY_DRIVER
-bool Adafruit_CC3000::startSmartConfig(const char *_deviceName, const char *smartConfigKey)
+bool Adafruit_CC3000::startSmartConfig(const char *_deviceName, const char *smartConfigKey, uint32_t timeout)
 {
   bool enableAES = smartConfigKey != NULL;
   cc3000Bitset.clear();
 
-  uint32_t   timeout = 0;
+  uint32_t   time = 0;
 
   if (!_initialised) {
     return false;
@@ -858,8 +858,8 @@ bool Adafruit_CC3000::startSmartConfig(const char *_deviceName, const char *smar
   {
     cc3k_int_poll();
     // waiting here for event SIMPLE_CONFIG_DONE
-    timeout+=10;
-    if (timeout > 60000)   // ~60s
+    time+=10;
+    if (time > timeout)   // default of 60s
     {
       return false;
     }
@@ -901,18 +901,18 @@ bool Adafruit_CC3000::startSmartConfig(const char *_deviceName, const char *smar
                 "Failed setting event mask", false);  
 
   // Wait for a connection
-  timeout = 0;
+  time = 0;
   while(!cc3000Bitset.test(CC3000BitSet::IsConnected))
   {
     cc3k_int_poll();
-    if(timeout > WLAN_CONNECT_TIMEOUT) // ~20s
+    if (time > WLAN_CONNECT_TIMEOUT) // default of 10s
     {
       CHECK_PRINTER {
         CC3KPrinter->println(F("Timed out waiting to connect"));
       }
       return false;
     }
-    timeout += 10;
+    time += 10;
     delay(10);
   }
   
