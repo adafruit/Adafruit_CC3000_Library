@@ -241,7 +241,14 @@ bool Adafruit_CC3000::begin(uint8_t patchReq, bool useSmartConfigData, const cha
 {
   if (_initialised) return true;
 
-  #ifndef CORE_ADAX
+  #if defined(digitalPinToInterrupt)
+  // digitalPinToInterrupt macro is supported on Arduino 1.0.6+ and 1.5.6+
+  // returns NOT_AN_INTERRUPT (-1 = 0xFF) if g_irqPin is not mapped to an INT
+  #ifndef NOT_AN_INTERRUPT
+    #define NOT_AN_INTERRUPT (-1)
+  #endif
+  g_IRQnum = digitalPinToInterrupt(g_irqPin);
+  #elif !defined(CORE_ADAX)
   // determine irq #
   for (uint8_t i=0; i<sizeof(dreqinttable); i+=2) {
     if (g_irqPin == dreqinttable[i]) {
