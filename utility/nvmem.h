@@ -154,7 +154,7 @@ extern INT32 nvmem_write(UINT32 ulFileId, UINT32 ulLength, UINT32 ulEntryOffset,
 //!               mac address as appears over the air (OUI first)
 //!	 
 //*****************************************************************************
-extern	UINT8 nvmem_set_mac_address(UINT8 *mac);
+extern UINT8 nvmem_set_mac_address(UINT8 *mac);
 
 
 //*****************************************************************************
@@ -169,7 +169,7 @@ extern	UINT8 nvmem_set_mac_address(UINT8 *mac);
 //!               mac address as appears over the air (OUI first)
 //!	 
 //*****************************************************************************
-extern	UINT8 nvmem_get_mac_address(UINT8 *mac);
+extern UINT8 nvmem_get_mac_address(UINT8 *mac);
 
 
 //*****************************************************************************
@@ -189,7 +189,7 @@ extern	UINT8 nvmem_get_mac_address(UINT8 *mac);
 //!              applied in SP_PORTION_SIZE bytes portions.
 //!	 
 //*****************************************************************************
-extern	UINT8 nvmem_write_patch(UINT32 ulFileId, UINT32 spLength, const UINT8 *spData);
+extern UINT8 nvmem_write_patch(UINT32 ulFileId, UINT32 spLength, const UINT8 *spData);
 
 
 //*****************************************************************************
@@ -206,7 +206,7 @@ extern	UINT8 nvmem_write_patch(UINT32 ulFileId, UINT32 spLength, const UINT8 *sp
 //!	 
 //*****************************************************************************
 #ifndef CC3000_TINY_DRIVER 
-extern	UINT8 nvmem_read_sp_version(UINT8* patchVer);
+extern UINT8 nvmem_read_sp_version(UINT8* patchVer);
 #endif
 
 //*****************************************************************************

@@ -50,6 +50,9 @@
 
 #include <stdio.h>
 #include <string.h>
+// Adafruit CC3k Host Driver Difference
+// Arduino specific header includes & include debug header.
+// Noted 12-12-2014 by tdicola
 #include <avr/pgmspace.h>
 
 #ifdef __AVR__
@@ -101,27 +104,27 @@ INT32 nvmem_read(UINT32 ulFileId, UINT32 ulLength, UINT32 ulOffset, UINT8 *buff)
 	UINT8 ucStatus = 0xFF;
 	UINT8 *ptr;
 	UINT8 *args;
-	
+
 	ptr = tSLInformation.pucTxCommandBuffer;
 	args = (ptr + HEADERS_SIZE_CMD);
-	
+
 	// Fill in HCI packet structure
 	args = UINT32_TO_STREAM(args, ulFileId);
 	args = UINT32_TO_STREAM(args, ulLength);
 	args = UINT32_TO_STREAM(args, ulOffset);
-	
+
 	// Initiate a HCI command
 	hci_command_send(HCI_CMND_NVMEM_READ, ptr, NVMEM_READ_PARAMS_LEN);
 	SimpleLinkWaitEvent(HCI_CMND_NVMEM_READ, &ucStatus);
-	
+
 	// In case there is data - read it - even if an error code is returned
-   // Note: It is the user responsibility to ignore the data in case of an error code
-	
+	// Note: It is the user responsibility to ignore the data in case of an error code
+
 	// Wait for the data in a synchronous way. Here we assume that the buffer is 
 	// big enough to store also parameters of nvmem
-	
+
 	SimpleLinkWaitData(buff, 0, 0);
-	
+
 	return(ucStatus);
 }
 
@@ -152,20 +155,23 @@ INT32 nvmem_write(UINT32 ulFileId, UINT32 ulLength, UINT32 ulEntryOffset, UINT8 
 	INT32 iRes;
 	UINT8 *ptr;
 	UINT8 *args;
-	
+
 	iRes = EFAIL;
-	
+
 	ptr = tSLInformation.pucTxCommandBuffer;
 	args = (ptr + SPI_HEADER_SIZE + HCI_DATA_CMD_HEADER_SIZE);
-	
+
 	// Fill in HCI packet structure
 	args = UINT32_TO_STREAM(args, ulFileId);
 	args = UINT32_TO_STREAM(args, 12);
 	args = UINT32_TO_STREAM(args, ulLength);
 	args = UINT32_TO_STREAM(args, ulEntryOffset);
-	
+
 	memcpy((ptr + SPI_HEADER_SIZE + HCI_DATA_CMD_HEADER_SIZE + 
 					NVMEM_WRITE_PARAMS_LEN),buff,ulLength);
+// Adafruit CC3k Host Driver Difference
+// Extra debug output.
+// Noted 12-12-2014 by tdicola
 #if (DEBUG_MODE == 1)
 	PRINT_F("Writing:\t");
 	for (UINT8 i=0; i<ulLength; i++) {
@@ -177,10 +183,10 @@ INT32 nvmem_write(UINT32 ulFileId, UINT32 ulLength, UINT32 ulEntryOffset, UINT8 
 #endif
 	// Initiate a HCI command but it will come on data channel
 	hci_data_command_send(HCI_CMND_NVMEM_WRITE, ptr, NVMEM_WRITE_PARAMS_LEN,
-												ulLength);
-	
+		ulLength);
+
 	SimpleLinkWaitEvent(HCI_EVNT_NVMEM_WRITE, &iRes);
-	
+
 	return(iRes);
 }
 
@@ -244,6 +250,10 @@ UINT8 nvmem_write_patch(UINT32 ulFileId, UINT32 spLength, const UINT8 *spData)
 	UINT8 	status = 0;
 	UINT16	offset = 0;
 	UINT8*      spDataPtr = (UINT8*)spData;
+	// Adafruit CC3k Host Driver Difference
+	// Copy nvram data from flash memory on Arduino into buffer in memory.  This is to reduce
+	// memory usage by storing nvram data in flash memory vs. RAM (very limited on Uno!).
+	// Noted 12-12-2014 by tdicola
 	UINT8 rambuffer[SP_PORTION_SIZE];
 
 	while ((status == 0) && (spLength >= SP_PORTION_SIZE))
@@ -265,20 +275,20 @@ UINT8 nvmem_write_patch(UINT32 ulFileId, UINT32 spLength, const UINT8 *spData)
 	  spLength -= SP_PORTION_SIZE;
 	  spDataPtr += SP_PORTION_SIZE;
 	}
-	
+
 	if (status !=0)
 	{
 		// NVMEM error occurred
 		return status;
 	}
-	
+
 	if (spLength != 0)
 	{
 	  memcpy_P(rambuffer, spDataPtr, SP_PORTION_SIZE);
 	  // if reached here, a reminder is left
 	  status = nvmem_write(ulFileId, spLength, offset, rambuffer);
 	}
-	
+
 	return status;
 }
 
@@ -302,18 +312,18 @@ UINT8 nvmem_read_sp_version(UINT8* patchVer)
 	UINT8 *ptr;
 	// 1st byte is the status and the rest is the SP version
 	UINT8	retBuf[5];	
-	
+
 	ptr = tSLInformation.pucTxCommandBuffer;
-  
-   // Initiate a HCI command, no args are required
+
+	// Initiate a HCI command, no args are required
 	hci_command_send(HCI_CMND_READ_SP_VERSION, ptr, 0);	
 	SimpleLinkWaitEvent(HCI_CMND_READ_SP_VERSION, retBuf);
-	
+
 	// package ID
 	*patchVer = retBuf[3];			
 	// package build number
 	*(patchVer+1) = retBuf[4];		
-	
+
 	return(retBuf[0]);
 }
 #endif
@@ -346,17 +356,17 @@ INT32 nvmem_create_entry(UINT32 ulFileId, UINT32 ulNewLen)
 	UINT8 *ptr; 
 	UINT8 *args;
 	UINT8 retval;
-	
+
 	ptr = tSLInformation.pucTxCommandBuffer;
 	args = (ptr + HEADERS_SIZE_CMD);
-	
+
 	// Fill in HCI packet structure
 	args = UINT32_TO_STREAM(args, ulFileId);
 	args = UINT32_TO_STREAM(args, ulNewLen);
-	
+
 	// Initiate a HCI command
 	hci_command_send(HCI_CMND_NVMEM_CREATE_ENTRY,ptr, NVMEM_CREATE_PARAMS_LEN);
-	
+
 	SimpleLinkWaitEvent(HCI_CMND_NVMEM_CREATE_ENTRY, &retval);
 
 	return(retval);

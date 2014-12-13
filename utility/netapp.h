@@ -43,6 +43,9 @@
 #ifndef __NETAPP_H__
 #define	__NETAPP_H__
 
+// Adafruit CC3k Host Driver Difference
+// Include root Arduino header.
+// Noted 12-12-2014 by tdicola
 #include <Arduino.h>
 #include "data_types.h"
 
@@ -150,7 +153,7 @@ extern 	INT32 netapp_dhcp(UINT32 *aucIP, UINT32 *aucSubnetMask,UINT32 *aucDefaul
 //!                     0 or 0xffffffff == infinity lease timeout.
 //!                     Resolution:10 seconds. Influence: only after 
 //!                     reconnecting to the AP. 
-//!                     Minimal bound value: MIN_TIMER_VAL_SECONDS - 20 seconds.
+//!                     Minimal bound value: MIN_TIMER_VAL_SECONDS - 10 seconds.
 //!                     The parameter is saved into the CC3000 NVMEM. 
 //!                     The default value on CC3000 is 14400 seconds.
 //!	 
@@ -159,7 +162,7 @@ extern 	INT32 netapp_dhcp(UINT32 *aucIP, UINT32 *aucSubnetMask,UINT32 *aucDefaul
 //!                     the end of the timeout. 
 //!                     Range: [0-0xffffffff] seconds, 0 == infinity ARP timeout
 //!                     Resolution: 10 seconds. Influence: on runtime.
-//!                     Minimal bound value: MIN_TIMER_VAL_SECONDS - 20 seconds
+//!                     Minimal bound value: MIN_TIMER_VAL_SECONDS - 10 seconds
 //!                     The parameter is saved into the CC3000 NVMEM. 
 //!	                    The default value on CC3000 is 3600 seconds.
 //!
@@ -167,7 +170,7 @@ extern 	INT32 netapp_dhcp(UINT32 *aucIP, UINT32 *aucSubnetMask,UINT32 *aucDefaul
 //!                         Range: [0-0xffffffff] seconds, 0 == infinity timeout
 //!                         Resolution: 10 seconds.
 //!                         Influence: on runtime.
-//!                         Minimal bound value: MIN_TIMER_VAL_SECONDS - 20 sec
+//!                         Minimal bound value: MIN_TIMER_VAL_SECONDS - 10 sec
 //!                         The parameter is saved into the CC3000 NVMEM. 
 //!                         The default value on CC3000 is 10 seconds.
 //!
@@ -176,7 +179,7 @@ extern 	INT32 netapp_dhcp(UINT32 *aucIP, UINT32 *aucSubnetMask,UINT32 *aucDefaul
 //!                          end of the socket timeout the socket will be closed
 //!                          Range: [0-0xffffffff] sec, 0 == infinity timeout.
 //!                          Resolution: 10 seconds. Influence: on runtime.
-//!                          Minimal bound value: MIN_TIMER_VAL_SECONDS - 20 sec
+//!                          Minimal bound value: MIN_TIMER_VAL_SECONDS - 10 sec
 //!                          The parameter is saved into the CC3000 NVMEM. 
 //!	                         The default value on CC3000 is 60 seconds.
 //!
@@ -186,12 +189,12 @@ extern 	INT32 netapp_dhcp(UINT32 *aucIP, UINT32 *aucSubnetMask,UINT32 *aucDefaul
 //!               DHCP lease timeout, ARP  refresh timeout, keepalive event 
 //!               timeout and socket inactivity timeout 
 //!	 
-//! @note         If a parameter set to non zero value which is less than 20s,
-//!               it will be set automatically to 20s.
+//! @note         If a parameter set to non zero value which is less than 10s,
+//!               it will be set automatically to 10s.
 //!
 //*****************************************************************************
- #ifndef CC3000_TINY_DRIVER
-extern INT32 netapp_timeout_values(UINT32 *aucDHCP, UINT32 *aucARP,UINT32 *aucKeepalive,	UINT32 *aucInactivity);
+#ifndef CC3000_TINY_DRIVER
+extern INT32 netapp_timeout_values(UINT32 *aucDHCP, UINT32 *aucARP, UINT32 *aucKeepalive, UINT32 *aucInactivity);
 #endif
 
 //*****************************************************************************
@@ -348,6 +351,9 @@ INT32 netapp_set_debug_level(UINT32 ulLevel);
 }
 #endif // __cplusplus
 
+// Adafruit CC3k Host Driver Difference
+// Define reference to CC3k debug printer object.
+// Noted 12-12-2014 by tdicola
 extern Print* CC3KPrinter;
 
 #endif	// __NETAPP_H__

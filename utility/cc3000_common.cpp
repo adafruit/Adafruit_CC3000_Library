@@ -47,14 +47,17 @@
 //
 //*****************************************************************************
 /******************************************************************************
- *
- * Include files
- *
- *****************************************************************************/
+*
+* Include files
+*
+*****************************************************************************/
 #include "cc3000_common.h"
 #include "socket.h"
 #include "wlan.h"
 #include "evnt_handler.h"
+// Adafruit CC3k Host Driver Difference
+// Include our own debug header & root Arduino header.
+// Noted 12-12-2014 by tdicola
 #include "debug.h"
 #include <Arduino.h>
 
@@ -72,7 +75,7 @@
 //*****************************************************************************
 void __error__(CHAR *pcFilename, UINT32 ulLine)
 {
-    //TODO full up function
+	//TODO full up function
 }
 
 
@@ -135,19 +138,10 @@ UINT8* UINT16_TO_STREAM_f (UINT8 *p, UINT16 u16)
 //
 //*****************************************************************************
 
-UINT16 STREAM_TO_UINT16_f(CHAR* cp, UINT16 offset)
+UINT16 STREAM_TO_UINT16_f(CHAR* p, UINT16 offset)
 {
-  UINT8 *p = (UINT8 *)cp;
-  /*
-  DEBUGPRINT_F("Stream2u16: ");
-  DEBUGPRINT_HEX(cp[offset+1]);
-  DEBUGPRINT_F(" + ");
-  DEBUGPRINT_HEX(cp[offset]);
-  DEBUGPRINT_F("\n\r");
-  */
-
-  return (UINT16)((UINT16)((UINT16)
-          (*(p + offset + 1)) << 8) + (UINT16)(*(p + offset)));
+	return (UINT16)((UINT16)((UINT16)
+		(*(p + offset + 1)) << 8) + (UINT16)(*(p + offset)));
 }
 
 //*****************************************************************************
@@ -164,23 +158,12 @@ UINT16 STREAM_TO_UINT16_f(CHAR* cp, UINT16 offset)
 //
 //*****************************************************************************
 
-UINT32 STREAM_TO_UINT32_f(CHAR* cp, UINT16 offset)
+UINT32 STREAM_TO_UINT32_f(CHAR* p, UINT16 offset)
 {
-  UINT8 *p = (UINT8 *)cp;
-  
-  /*
-  DEBUGPRINT_F("\tStream2u32: ");
-  DEBUGPRINT_HEX(cp[offset+3]);  DEBUGPRINT_F(" + ");
-  DEBUGPRINT_HEX(cp[offset+2]);  DEBUGPRINT_F(" + ");
-  DEBUGPRINT_HEX(cp[offset+1]);  DEBUGPRINT_F(" + ");
-  DEBUGPRINT_HEX(cp[offset]);
-  DEBUGPRINT_F("\n\r");
-  */
-
-  return (UINT32)((UINT32)((UINT32)
-	(*(p + offset + 3)) << 24) + (UINT32)((UINT32)
-	(*(p + offset + 2)) << 16) + (UINT32)((UINT32)
-	(*(p + offset + 1)) << 8) + (UINT32)(*(p + offset)));
+	return (UINT32)((UINT32)((UINT32)
+		(*(p + offset + 3)) << 24) + (UINT32)((UINT32)
+		(*(p + offset + 2)) << 16) + (UINT32)((UINT32)
+		(*(p + offset + 1)) << 8) + (UINT32)(*(p + offset)));
 }
 
 

@@ -4,6 +4,8 @@
 
 #include "sntp.h"
 
+#define CLOCK_DEBUG 1
+
 //Lists of pool servers
 
 

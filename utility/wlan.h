@@ -63,10 +63,16 @@ products from Adafruit!
 extern "C" {
 #endif
 
-#define      WLAN_SEC_UNSEC (0)
-#define      WLAN_SEC_WEP	(1)
-#define      WLAN_SEC_WPA	(2)
-#define      WLAN_SEC_WPA2	(3)
+#define    WLAN_SEC_UNSEC    (0)
+#define    WLAN_SEC_WEP      (1)
+#define    WLAN_SEC_WPA      (2)
+#define    WLAN_SEC_WPA2     (3)
+
+#define    WLAN_STATUS_DISCONNECTED    (0)
+#define    WLAN_STATUS_SCANNING        (1)
+#define    WLAN_STATUS_CONNECTING      (2)
+#define    WLAN_STATUS_CONNECTED       (3)
+
 //*****************************************************************************
 //
 //! \addtogroup wlan_api
@@ -185,7 +191,7 @@ extern void wlan_stop(void);
 //!  @param    ssid       up to 32 bytes and is ASCII SSID of the AP
 //!  @param    ssid_len   length of the SSID
 //!  @param    bssid      6 bytes specified the AP bssid
-//!  @param    key        up to 16 bytes specified the AP security key
+//!  @param    key        up to 32 bytes specified the AP security key
 //!  @param    key_len    key length 
 //!
 //!  @return     On success, zero is returned. On error, negative is returned. 
@@ -205,6 +211,10 @@ extern void wlan_stop(void);
 //
 //*****************************************************************************
 #ifndef CC3000_TINY_DRIVER
+// Adafruit CC3k Host Driver Difference
+// Make ssid a const char pointer because it isn't modified and the Adafruit
+// driver code needs it to be const to interface with Arduino's client library.
+// Noted 12-12-2014 by tdicola
 extern INT32 wlan_connect(UINT32 ulSecType, const CHAR *ssid, INT32 ssid_len,
                         UINT8 *bssid, UINT8 *key, INT32 key_len);
 #else
@@ -242,7 +252,7 @@ extern INT32 wlan_disconnect(void);
 //!  @param    ulPassPhraseLen  security key length for WPA\WPA2
 //!
 //!  @return    On success, index (1-7) of the stored profile is returned.         
-//!                             On error, -1 is returned.        
+//!				On error, -1 is returned.        
 //!
 //!  @brief     When auto start is enabled, the device connects to
 //!             station from the profiles table. Up to 7 profiles are supported. 

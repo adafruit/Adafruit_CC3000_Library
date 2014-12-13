@@ -44,6 +44,7 @@
 #define __COMMON_H__
 
 #include "data_types.h"
+#include "error_codes.h"
 
 //******************************************************************************
 // Include files
@@ -72,16 +73,12 @@ extern "C" {
 //*****************************************************************************
 //                  COMMON DEFINES
 //*****************************************************************************
-#define ERROR_SOCKET_INACTIVE   -57 
-
 #define WLAN_ENABLE      (1)   
 #define WLAN_DISABLE     (0)
 
 #define	MAC_ADDR_LEN	(6)
 
 #define	SP_PORTION_SIZE	(32)
-
-// #define CC3000_TINY_DRIVER
   
 /*Defines for minimal and maximal RX buffer size. This size includes the spi 
   header and hci header.
@@ -91,7 +88,7 @@ extern "C" {
     HCI header + SPI header + max args size
 
   This buffer is used for receiving events and data.
-  The packet can not be INT32er than MTU size and CC3000 does not support 
+  The packet can not be longer than MTU size and CC3000 does not support 
   fragmentation. Note that the same buffer is used for reception of the data 
   and events from CC3000. That is why the minimum is defined. 
   The calculation for the actual size of buffer for reception is:
@@ -115,11 +112,11 @@ extern "C" {
 */
 
 #define CC3000_MINIMAL_RX_SIZE      (130 + 1)
-#define CC3000_MAXIMAL_RX_SIZE      (1519 + 1)
+#define CC3000_MAXIMAL_RX_SIZE      (511 + 1)
 
 /*Defines for minimal and maximal TX buffer size.
   This buffer is used for sending events and data.
-  The packet can not be INT32er than MTU size and CC3000 does not support 
+  The packet can not be longer than MTU size and CC3000 does not support 
   fragmentation. Note that the same buffer is used for transmission of the data
   and commands. That is why the minimum is defined.
   The calculation for the actual size of buffer for transmission is:
@@ -136,8 +133,8 @@ extern "C" {
  
   The 1 is used for the overrun detection */ 
 
-#define	CC3000_MINIMAL_TX_SIZE      (130 + 1)  
-#define	CC3000_MAXIMAL_TX_SIZE      (1519 + 1)
+#define	CC3000_MINIMAL_TX_SIZE      (130 + 1)
+#define	CC3000_MAXIMAL_TX_SIZE      (511 + 1)
 
 //TX and RX buffer sizes, allow to receive and transmit maximum data at length 8.
 #ifdef CC3000_TINY_DRIVER
@@ -156,8 +153,13 @@ extern "C" {
   
 #ifndef CC3000_TINY_DRIVER
   
-	#define CC3000_RX_BUFFER_SIZE   (CC3000_MINIMAL_RX_SIZE)
-	#define CC3000_TX_BUFFER_SIZE   (CC3000_MINIMAL_TX_SIZE)
+#ifdef MDNS_ADVERTISE_HOST
+    #define CC3000_RX_BUFFER_SIZE   (CC3000_MAXIMAL_RX_SIZE)
+    #define CC3000_TX_BUFFER_SIZE   (CC3000_MAXIMAL_TX_SIZE)
+#else
+    #define CC3000_RX_BUFFER_SIZE   (CC3000_MINIMAL_RX_SIZE)
+    #define CC3000_TX_BUFFER_SIZE   (CC3000_MINIMAL_TX_SIZE)
+#endif
   
 //if defined TINY DRIVER we use smaller RX and TX buffer in order to minimize RAM consumption
 #else
@@ -169,6 +171,9 @@ extern "C" {
 //*****************************************************************************
 //                  Compound Types
 //*****************************************************************************
+// Adafruit CC3k Host Driver Difference
+// Time type compatibility with Arduino
+// Noted 12-12-2014 by tdicola
 #ifdef __AVR__
 typedef UINT32 time_t;  /* KTown: Updated to be compatible with Arduino Time.h */
 #else
@@ -336,6 +341,10 @@ extern UINT16 STREAM_TO_UINT16_f(CHAR* p, UINT16 offset);
 
 extern UINT32 STREAM_TO_UINT32_f(CHAR* p, UINT16 offset);
 
+
+// Adafruit CC3k Host Driver Difference
+// cc3k_int_poll function is used to try to make missed interrupts less common.
+// Noted 12-12-2014 by tdicola
 
 //*****************************************************************************
 //
