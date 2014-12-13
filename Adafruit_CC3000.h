@@ -123,7 +123,7 @@ class Adafruit_CC3000_Client : public Client {
   int16_t bufsiz;
 
  private:
-  int16_t _socket;
+  int32_t _socket;
 
 };
 

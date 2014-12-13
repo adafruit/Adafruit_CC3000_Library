@@ -108,7 +108,7 @@ private:
   // The port this server will listen for connections on.
   uint16_t _port;
   // The id of the listening socket.
-  uint16_t _listenSocket;
+  uint32_t _listenSocket;
 
   // Accept new connections and update the connected clients.
   bool acceptNewConnections();
