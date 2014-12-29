@@ -85,7 +85,7 @@ class Adafruit_CC3000;
 
 class Adafruit_CC3000_Client : public Client {
  public:
-  Adafruit_CC3000_Client(uint16_t s);
+  Adafruit_CC3000_Client(int32_t s);
   Adafruit_CC3000_Client(void);
   Adafruit_CC3000_Client(const Adafruit_CC3000_Client& copy);
   void operator=(const Adafruit_CC3000_Client& other);

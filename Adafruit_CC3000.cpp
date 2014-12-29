@@ -1385,7 +1385,7 @@ Adafruit_CC3000_Client::Adafruit_CC3000_Client(void) {
   _socket = -1;
 }
 
-Adafruit_CC3000_Client::Adafruit_CC3000_Client(uint16_t s) {
+Adafruit_CC3000_Client::Adafruit_CC3000_Client(int32_t s) {
   _socket = s; 
   bufsiz = 0;
   _rx_buf_idx = 0;
