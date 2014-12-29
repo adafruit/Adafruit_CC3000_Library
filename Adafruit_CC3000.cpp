@@ -1430,6 +1430,12 @@ int Adafruit_CC3000_Client::connect(const char *host, uint16_t port){
 
 int Adafruit_CC3000_Client::connect(IPAddress destIP, uint16_t destPort)
 {
+  // Note this function is almost exactly the same as connectTCP on the Adafruit CC3000 class.
+  // The only difference is it resets the client's buffers to be empty, and then implements the
+  // same logic as connect.
+  // TODO: Refactor this entire function away so there is a single common function for connecting
+  // to a TCP socket that both this function and the connectTCP function will use.
+
   bufsiz = 0;
   _rx_buf_idx = 0;
   sockaddr      socketAddress;
@@ -1446,6 +1452,8 @@ int Adafruit_CC3000_Client::connect(IPAddress destIP, uint16_t destPort)
     return 0;
   }
   //CC3KPrinter->print(F("DONE (socket ")); CC3KPrinter->print(tcp_socket); CC3KPrinter->println(F(")"));
+
+  closed_sockets[tcp_socket] = false; // Clear any previous closed event
 
   // Try to open the socket
   memset(&socketAddress, 0x00, sizeof(socketAddress));
