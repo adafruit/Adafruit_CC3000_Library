@@ -139,6 +139,13 @@ void setup(void)
   /* NOTE: Secure connections are not available in 'Tiny' mode!
      By default connectToAP will retry indefinitely, however you can pass an
      optional maximum number of retries (greater than zero) as the fourth parameter.
+     
+     ALSO NOTE: By default connectToAP will retry forever until it can connect to
+     the access point.  This means if the access point doesn't exist the call
+     will _never_ return!  You can however put in an optional maximum retry count
+     by passing a 4th parameter to the connectToAP function below.  This should
+     be a number of retries to make before giving up, for example 5 would retry
+     5 times and then fail if a connection couldn't be made.
   */
   if (!cc3000.connectToAP(WLAN_SSID, WLAN_PASS, WLAN_SECURITY)) {
     Serial.println(F("Failed!"));
