@@ -148,6 +148,13 @@ typedef INT32 __fd_mask;
 #define __FDELT(d)              ((d) / __NFDBITS)
 #define __FDMASK(d)             ((__fd_mask) 1 << ((d) % __NFDBITS))
 
+// Adafruit CC3k Host Driver Difference
+// Need to unset this if set or else compilation fails on the Arduino Due (newlib quirk?)
+// Noted 1-24-2015 by tdicola
+#ifdef fd_set
+#undef fd_set  // for compatibility with newlib, which defines fd_set
+#endif
+
 // fd_set for select and pselect.
 typedef struct
 {
@@ -169,6 +176,21 @@ typedef struct
 #define __FD_ISSET(d, set)     (__FDS_BITS (set)[__FDELT (d)] & __FDMASK (d))
 
 // Access macros for 'fd_set'.
+// Adafruit CC3k Host Driver Difference
+// Need to unset these macros if set or else compilation fails on the Arduino Due (newlib quirk?)
+// Noted 1-24-2015 by tdicola
+#ifdef FD_SET
+#undef FD_SET
+#endif
+#ifdef FD_CLR
+#undef FD_CLR
+#endif
+#ifdef FD_ISSET
+#undef FD_ISSET
+#endif
+#ifdef FD_ZERO
+#undef FD_ZERO
+#endif
 #define FD_SET(fd, fdsetp)      __FD_SET (fd, fdsetp)
 #define FD_CLR(fd, fdsetp)      __FD_CLR (fd, fdsetp)
 #define FD_ISSET(fd, fdsetp)    __FD_ISSET (fd, fdsetp)

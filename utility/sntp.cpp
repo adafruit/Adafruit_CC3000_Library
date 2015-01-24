@@ -65,12 +65,12 @@ char    monthDays[12] = { 31,  28,  31,  30,  31,  30,  31,  31,  30,  31,  30, 
 		char* pAscii = ascii;
 	
 	delay(10);
-		if (CC3KPrinter != 0) { CC3KPrinter->print(F("Block: (addr ")); CC3KPrinter->print((uint16_t)buf, HEX); CC3KPrinter->print(F(", length ")); CC3KPrinter->print(len, HEX); }
+		if (CC3KPrinter != 0) { CC3KPrinter->print(F("Block: (addr ")); CC3KPrinter->print((uint32_t)buf, HEX); CC3KPrinter->print(F(", length ")); CC3KPrinter->print(len, HEX); }
 	//	traceFn("Block: (addr %p, length 0x%04x)", buf, len);
 
 		while (count < len)
 		{
-			if (CC3KPrinter != 0) { CC3KPrinter->println(); CC3KPrinter->print((uint16_t)offset,HEX); CC3KPrinter->print(F(": ")); }
+			if (CC3KPrinter != 0) { CC3KPrinter->println(); CC3KPrinter->print((uint32_t)offset,HEX); CC3KPrinter->print(F(": ")); }
 	//		traceFn("\r\n  %p: ", offset);
 			lineCount = 0;
 			pAscii = (char*)&ascii;
