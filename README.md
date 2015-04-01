@@ -1,4 +1,4 @@
-This is a library for the Adafruit CC3000 WiFi Breakouts etc
+ # This is a library for the Adafruit CC3000 WiFi Breakouts etc
 
 Designed specifically to work with the Adafruit CC3000 Breakout 
   ----> https://www.adafruit.com/products/1469
