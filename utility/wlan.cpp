@@ -709,7 +709,13 @@ INT32 wlan_add_profile(UINT32 ulSecType,
 		}
 
 		break;
-	}    
+
+		// Adafruit CC3k Host Driver Difference
+		// Break out of function for unknown security type to prevent compiler warnings.
+		// Noted 04-08-2015 by tdicola
+	default:
+		return -1;
+	}
 
 	// Initiate a HCI command
 	hci_command_send(HCI_CMND_WLAN_IOCTL_ADD_PROFILE,

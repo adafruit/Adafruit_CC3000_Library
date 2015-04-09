@@ -183,7 +183,7 @@ INT16 HostFlowControlConsumeBuff(INT16 sd)
 			FD_SET(sd, &fd_read);
 			timeout.tv_sec = 0;
 			timeout.tv_usec = 5000;
-			int16_t s = select(sd+1, &fd_read, NULL, NULL, &timeout);
+			select(sd+1, &fd_read, NULL, NULL, &timeout);
 			// Note the results of the select are ignored for now.  Attempts to
 			// have smart behavior like returning an error when there is data
 			// to read and no free buffers for sending just seem to cause more
@@ -1113,7 +1113,10 @@ INT16 simple_link_send(INT32 sd, const void *buf, INT32 len, INT32 flags,
 
 	default:
 		{
-			break;
+			// Adafruit CC3k Host Driver Difference
+			// Break out of function for unknown operation to prevent compiler warnings.
+			// Noted 04-08-2015 by tdicola
+			return -1;
 		}
 	}
 
