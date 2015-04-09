@@ -30,7 +30,7 @@ This example does a test of the SNTP (Simple Network Time Protocol) client:
 //#include "utility/NetTime.h"
 #include <string.h>
 #include "utility/debug.h"
-#include "utility/sntp.h"
+#include "sntp.h"
 
 // These are the interrupt and control pins
 #define ADAFRUIT_CC3000_IRQ   3  // MUST be an interrupt pin!
