@@ -176,7 +176,7 @@ class Adafruit_CC3000 {
 
 
     uint16_t ping(uint32_t ip, uint8_t attempts=3,  uint16_t timeout=500, uint8_t size=32);
-    uint16_t getHostByName(char *hostname, uint32_t *ip);
+    uint16_t getHostByName(const char *hostname, uint32_t *ip);
     #endif
 
     /* Functions that aren't available with the tiny driver */

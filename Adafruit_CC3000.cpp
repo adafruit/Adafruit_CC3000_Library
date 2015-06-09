@@ -1195,7 +1195,7 @@ uint16_t Adafruit_CC3000::ping(uint32_t ip, uint8_t attempts, uint16_t timeout, 
 #endif
 
 #ifndef CC3000_TINY_DRIVER
-uint16_t Adafruit_CC3000::getHostByName(char *hostname, uint32_t *ip) {
+uint16_t Adafruit_CC3000::getHostByName(const char *hostname, uint32_t *ip) {
   if (!_initialised) return 0;
   if (!cc3000Bitset.test(CC3000BitSet::IsConnected)) return 0;
   if (!cc3000Bitset.test(CC3000BitSet::HasDHCP)) return 0;
