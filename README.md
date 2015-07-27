@@ -1,4 +1,4 @@
-# Adafruit CC3000 Library
+# Adafruit CC3000 Library [![Build Status](https://travis-ci.org/adafruit/Adafruit_CC3000_Library.svg?branch=master)](https://travis-ci.org/adafruit/Adafruit_CC3000_Library)
 
 This is a library for the Adafruit CC3000 WiFi Breakouts etc
 
