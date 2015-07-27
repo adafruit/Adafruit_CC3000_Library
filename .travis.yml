@@ -2,6 +2,8 @@ language: c
 sudo: false
 before_install:
   - source <(curl -SLs https://raw.githubusercontent.com/adafruit/travis-ci-arduino/master/install.sh)
+install:
+  - git clone https://github.com/adafruit/Cryptosuite.git $HOME/arduino_ide/libraries/SHA1
 script:
   - build_main_platforms
 notifications:
