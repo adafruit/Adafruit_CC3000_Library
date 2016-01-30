@@ -30,7 +30,7 @@
 */
 /**************************************************************************/
 
-#if defined (__arm__) && defined (__SAM3X8E__) // Arduino Due
+#if defined(ARDUINO_ARCH_SAMD) || defined (__arm__) || defined(ARDUINO_ARCH_SAM)
 // should use uinstd.h to define sbrk but on Arduino Due this causes a conflict
 extern "C" char* sbrk(int incr);
 int getFreeRam(void) {

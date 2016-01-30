@@ -74,8 +74,8 @@ static const uint8_t dreqinttable[] = {
   2, 1,
   0, 2,
   1, 3,
-#elif defined(__arm__) && defined(__SAM3X8E__) // Arduino Due  
-  0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 
+#elif defined(ARDUINO_ARCH_SAMD) || defined (__arm__) || defined(ARDUINO_ARCH_SAM)
+  0, 0, 1, 1, 2, 2, 3, 3, 4, 4,
   5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 
   10, 10, 11, 11, 12, 12, 13, 13, 14, 14, 
   15, 15, 16, 16, 17, 17, 18, 18, 19, 19, 
