@@ -236,7 +236,7 @@ unsigned long getTime(void) {
   Serial.print(F("Locating time server..."));
 
   // Hostname to IP lookup; use NTP pool (rotates through servers)
-  if(cc3000.getHostByName("pool.ntp.org", &ip)) {
+  if(cc3000.getHostByName("0.adafruit.pool.ntp.org", &ip)) {
     static const char PROGMEM
       timeReqA[] = { 227,  0,  6, 236 },
       timeReqB[] = {  49, 78, 49,  52 };

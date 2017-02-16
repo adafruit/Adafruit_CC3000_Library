@@ -9,23 +9,19 @@
 //Lists of pool servers
 
 
-const char* ntp_us_pool_list[] =  {	"0.us.pool.ntp.org",
-								"1.us.pool.ntp.org",
-								"2.us.pool.ntp.org",
-								"3.us.pool.ntp.org",
-								"0.north-america.pool.ntp.org",
-								"1.north-america.pool.ntp.org",
-								"2.north-america.pool.ntp.org",
-								"3.north-america.pool.ntp.org",
-								NULL
-							};
+const char* ntp_us_pool_list[] =  {	"0.adafruit.pool.ntp.org",
+					"1.adafruit.pool.ntp.org",
+					"2.adafruit.pool.ntp.org",
+					"3.adafruit.pool.ntp.org",
+					NULL
+};
 
-const char* ntp_global_pool_list[] =  {   "0.pool.ntp.org",
-									"1.pool.ntp.org",
-									"2.pool.ntp.org",
-									"pool.ntp.org",
-									NULL
-								};
+const char* ntp_global_pool_list[] =  {	"0.adafruit.pool.ntp.org",
+					"1.adafruit.pool.ntp.org",
+					"2.adafruit.pool.ntp.org",
+					"3.adafruit.pool.ntp.org",
+					NULL
+};
 
 // ExtractNTPTime - convert ntp seconds into calendar time
 //  Notes:
