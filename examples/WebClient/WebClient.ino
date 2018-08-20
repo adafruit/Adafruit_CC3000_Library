@@ -51,7 +51,7 @@ Adafruit_CC3000 cc3000 = Adafruit_CC3000(ADAFRUIT_CC3000_CS, ADAFRUIT_CC3000_IRQ
                                    // you're accessing is quick to respond, you can reduce this value.
 
 // What page to grab!
-#define WEBSITE      "www.adafruit.com"
+#define WEBSITE      "wifitest.adafruit.com"
 #define WEBPAGE      "/testwifi/index.html"
 
 
